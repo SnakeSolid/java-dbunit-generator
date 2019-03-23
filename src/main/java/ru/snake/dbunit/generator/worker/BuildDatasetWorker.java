@@ -1,6 +1,5 @@
 package ru.snake.dbunit.generator.worker;
 
-import java.awt.Color;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Connection;
@@ -17,10 +16,10 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
 
 import ru.snake.dbunit.generator.config.TypeMapping;
 import ru.snake.dbunit.generator.model.ConnectionSettings;
@@ -289,14 +288,11 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 		}
 
 		try {
-			SimpleAttributeSet attributes = new SimpleAttributeSet();
+			AttributeSet attributes = SimpleAttributeSet.EMPTY;
 			int length = this.outputDocument.getLength();
 			this.outputDocument.remove(0, length);
 
 			if (result.isError()) {
-				StyleConstants.setBold(attributes, true);
-				StyleConstants.setForeground(attributes, Color.RED);
-
 				this.outputDocument.insertString(0, result.getError(), attributes);
 			} else {
 				this.outputDocument.insertString(0, result.getValue(), attributes);
