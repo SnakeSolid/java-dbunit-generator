@@ -13,28 +13,29 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import ru.snake.dbunit.generator.MainFrame;
-import ru.snake.dbunit.generator.config.Configuration;
+import ru.snake.dbunit.generator.model.ConnectionListener;
 import ru.snake.dbunit.generator.model.ConnectionSettings;
 import ru.snake.dbunit.generator.model.MainModel;
 import ru.snake.dbunit.generator.worker.BuildDatasetWorker;
 
-public final class ExecuteQueryAction extends AbstractAction implements Action {
+/**
+ * Execute query action.
+ *
+ * @author snake
+ *
+ */
+public final class ExecuteQueryAction extends AbstractAction implements Action, ConnectionListener {
 
 	private final MainFrame mainFrame;
-
-	private final Configuration config;
 
 	/**
 	 * Create new select connection action.
 	 *
 	 * @param mainFrame
 	 *            main frame
-	 * @param config
-	 *            configuration settings
 	 */
-	public ExecuteQueryAction(final MainFrame mainFrame, final Configuration config) {
+	public ExecuteQueryAction(final MainFrame mainFrame) {
 		this.mainFrame = mainFrame;
-		this.config = config;
 
 		Icon smallIcon = new ImageIcon(ClassLoader.getSystemResource("icons/play-x16.png"));
 		Icon largeIcon = new ImageIcon(ClassLoader.getSystemResource("icons/play-x24.png"));
@@ -45,6 +46,9 @@ public final class ExecuteQueryAction extends AbstractAction implements Action {
 		putValue(LARGE_ICON_KEY, largeIcon);
 		putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("F5"));
 		putValue(MNEMONIC_KEY, KeyEvent.VK_E);
+
+		setEnabled(false);
+		mainFrame.getModel().addConnectionListener(this);
 	}
 
 	@Override
@@ -74,6 +78,13 @@ public final class ExecuteQueryAction extends AbstractAction implements Action {
 	 */
 	private void showError(final Exception e) {
 		JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), null, JOptionPane.ERROR_MESSAGE);
+	}
+
+	@Override
+	public void connectionChanged(final MainModel model, final ConnectionSettings settings) {
+		if (model == mainFrame.getModel()) {
+			setEnabled(settings != null);
+		}
 	}
 
 }

@@ -72,7 +72,7 @@ public final class MainFrame extends JFrame {
 	 */
 	private void createActions() {
 		selectConnectionAction = new SelectConnectionAction(this, this.config);
-		executeQueryAction = new ExecuteQueryAction(this, this.config);
+		executeQueryAction = new ExecuteQueryAction(this);
 	}
 
 	/**

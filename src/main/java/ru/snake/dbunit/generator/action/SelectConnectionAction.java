@@ -14,6 +14,12 @@ import ru.snake.dbunit.generator.MainFrame;
 import ru.snake.dbunit.generator.config.Configuration;
 import ru.snake.dbunit.generator.model.ConnectionSettings;
 
+/**
+ * Show connection settings dialog action.
+ *
+ * @author snake
+ *
+ */
 public final class SelectConnectionAction extends AbstractAction implements Action {
 
 	private final MainFrame mainFrame;
@@ -47,7 +53,7 @@ public final class SelectConnectionAction extends AbstractAction implements Acti
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(final ActionEvent e) {
 		dialog.setVisible(true);
 
 		if (dialog.hasSelectedConnection()) {

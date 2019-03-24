@@ -71,6 +71,10 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	protected Result<String, String> doInBackground() throws Exception {
 		List<Query> queries = QueryParser.parse(this.queryText);
 
+		if (queries.isEmpty()) {
+			return Result.error("Dataset must have at least one query.");
+		}
+
 		for (Query query : queries) {
 			if (query.getTableName() == null) {
 				StringBuilder builder = new StringBuilder();
