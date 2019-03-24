@@ -3,6 +3,7 @@ package ru.snake.dbunit.generator;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.MouseListener;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -21,6 +22,7 @@ import ru.snake.dbunit.generator.action.CloseFrameAction;
 import ru.snake.dbunit.generator.action.ExecuteQueryAction;
 import ru.snake.dbunit.generator.action.SelectConnectionAction;
 import ru.snake.dbunit.generator.config.Configuration;
+import ru.snake.dbunit.generator.listener.TextEditorMouseListener;
 import ru.snake.dbunit.generator.model.MainModel;
 
 /**
@@ -134,8 +136,10 @@ public final class MainFrame extends JFrame {
 	 */
 	private JComponent createEditor() {
 		Font font = getConfigFont();
+		MouseListener popupListener = new TextEditorMouseListener();
 		Document queryDocument = this.model.getQueryDocument();
 		JTextArea queryText = new JTextArea(queryDocument);
+		queryText.addMouseListener(popupListener);
 		queryText.setFont(font);
 
 		JScrollPane queryScroll = new JScrollPane(
@@ -146,6 +150,7 @@ public final class MainFrame extends JFrame {
 
 		Document datasetDocument = this.model.getDatasetDocument();
 		JTextArea datasetText = new JTextArea(datasetDocument);
+		datasetText.addMouseListener(popupListener);
 		datasetText.setBackground(UIManager.getColor("control"));
 		datasetText.setFont(font);
 		datasetText.setEditable(false);
