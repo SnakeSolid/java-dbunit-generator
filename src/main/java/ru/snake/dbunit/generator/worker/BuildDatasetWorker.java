@@ -11,7 +11,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JOptionPane;
@@ -143,36 +145,60 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	 */
 	private String getTableDataset(final Statement statement, final String query, final String tableName)
 			throws SQLException {
-		StringBuilder tableData = new StringBuilder();
+		StringBuilder tablrDatabaset = new StringBuilder();
+		Set<String> distinctRows = new HashSet<String>();
 
 		try (ResultSet resultSet = statement.executeQuery(query)) {
 			List<ColumnMapper> mappers = getMappers(resultSet);
 
 			while (resultSet.next()) {
-				tableData.append("    <");
-				tableData.append(tableName);
+				String tableRow = getTableRow(resultSet, tableName, mappers);
 
-				for (ColumnMapper mapper : mappers) {
-					String value = mapper.map(resultSet);
-
-					if (value != null) {
-						tableData.append(" ");
-						tableData.append(mapper.getColumnName());
-						tableData.append("=\"");
-						tableData.append(escapeControlCharacters(value));
-						tableData.append("\"");
-					}
+				if (distinctRows.add(tableRow)) {
+					tablrDatabaset.append(tableRow);
 				}
-
-				tableData.append(" />\n");
 			}
 		}
 
-		if (tableData.length() == 0) {
-			tableData.append("    <");
-			tableData.append(tableName);
-			tableData.append(" />\n");
+		if (distinctRows.isEmpty()) {
+			return "    <" + tableName + " />\n";
 		}
+
+		return tablrDatabaset.toString();
+	}
+
+	/**
+	 * Generate string representation of single table row.
+	 *
+	 * @param resultSet
+	 *            result set
+	 * @param tableName
+	 *            table name
+	 * @param mappers
+	 *            column mappers
+	 * @return table row string
+	 * @throws SQLException
+	 *             if error occurred
+	 */
+	private String getTableRow(final ResultSet resultSet, final String tableName, final List<ColumnMapper> mappers)
+			throws SQLException {
+		StringBuilder tableData = new StringBuilder();
+		tableData.append("    <");
+		tableData.append(tableName);
+
+		for (ColumnMapper mapper : mappers) {
+			String value = mapper.map(resultSet);
+
+			if (value != null) {
+				tableData.append(" ");
+				tableData.append(mapper.getColumnName());
+				tableData.append("=\"");
+				tableData.append(escapeControlCharacters(value));
+				tableData.append("\"");
+			}
+		}
+
+		tableData.append(" />\n");
 
 		return tableData.toString();
 	}
