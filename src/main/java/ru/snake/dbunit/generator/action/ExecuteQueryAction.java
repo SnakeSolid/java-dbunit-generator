@@ -7,12 +7,13 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import ru.snake.dbunit.generator.MainFrame;
+import ru.snake.dbunit.generator.Message;
+import ru.snake.dbunit.generator.config.Configuration;
 import ru.snake.dbunit.generator.model.ConnectionListener;
 import ru.snake.dbunit.generator.model.ConnectionSettings;
 import ru.snake.dbunit.generator.model.MainModel;
@@ -28,14 +29,19 @@ public final class ExecuteQueryAction extends AbstractAction implements Action, 
 
 	private final MainFrame mainFrame;
 
+	private final Configuration config;
+
 	/**
 	 * Create new select connection action.
 	 *
 	 * @param mainFrame
 	 *            main frame
+	 * @param config
+	 *            configuration
 	 */
-	public ExecuteQueryAction(final MainFrame mainFrame) {
+	public ExecuteQueryAction(final MainFrame mainFrame, final Configuration config) {
 		this.mainFrame = mainFrame;
+		this.config = config;
 
 		Icon smallIcon = new ImageIcon(ClassLoader.getSystemResource("icons/play-x16.png"));
 		Icon largeIcon = new ImageIcon(ClassLoader.getSystemResource("icons/play-x24.png"));
@@ -62,22 +68,12 @@ public final class ExecuteQueryAction extends AbstractAction implements Action, 
 
 		try {
 			String queryText = queryDocument.getText(0, queryLength);
-			BuildDatasetWorker worker = new BuildDatasetWorker(queryText, settings, datesetText);
+			BuildDatasetWorker worker = new BuildDatasetWorker(config, queryText, settings, datesetText);
 
 			worker.execute();
 		} catch (BadLocationException exception) {
-			showError(exception);
+			Message.showError(exception);
 		}
-	}
-
-	/**
-	 * Show exception message dialog.
-	 *
-	 * @param e
-	 *            exception
-	 */
-	private void showError(final Exception e) {
-		JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), null, JOptionPane.ERROR_MESSAGE);
 	}
 
 	@Override

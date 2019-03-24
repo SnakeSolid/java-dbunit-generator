@@ -16,6 +16,12 @@ import ru.snake.dbunit.generator.model.ConnectionParametersTableModel;
 import ru.snake.dbunit.generator.model.ConnectionSettings;
 import ru.snake.dbunit.generator.model.DriverListModel;
 
+/**
+ * Prepare connection settings to use in worker.
+ *
+ * @author snake
+ *
+ */
 public final class PrepareConnectionAction extends AbstractAction implements Action {
 
 	private final JDialog dialog;
@@ -28,6 +34,20 @@ public final class PrepareConnectionAction extends AbstractAction implements Act
 
 	private final Consumer<ConnectionSettings> consumer;
 
+	/**
+	 * Create new prepare connection action.
+	 *
+	 * @param dialog
+	 *            dialog
+	 * @param config
+	 *            configuration
+	 * @param driverListModel
+	 *            driver list model
+	 * @param parametersModel
+	 *            driver parameters model
+	 * @param consumer
+	 *            driver settings setter
+	 */
 	public PrepareConnectionAction(
 		final ConnectionDialog dialog,
 		final Configuration config,

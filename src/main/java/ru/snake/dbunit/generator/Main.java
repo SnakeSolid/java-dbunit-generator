@@ -2,7 +2,6 @@ package ru.snake.dbunit.generator;
 
 import java.util.Map;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
@@ -54,7 +53,7 @@ public final class Main {
 
 				SwingUtilities.invokeLater(() -> showMainFrame(config));
 			} catch (ConfigNotFoundException | ReadConfigException e) {
-				showError(e);
+				Message.showError(e);
 
 				System.exit(EXIT_CONFIGURATIN_ERROR);
 			}
@@ -67,16 +66,6 @@ public final class Main {
 
 			System.exit(EXIT_CONFIGURATIN_ERROR);
 		}
-	}
-
-	/**
-	 * Show exception message dialog.
-	 *
-	 * @param e
-	 *            exception
-	 */
-	private void showError(final Exception e) {
-		JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), null, JOptionPane.ERROR_MESSAGE);
 	}
 
 	/**

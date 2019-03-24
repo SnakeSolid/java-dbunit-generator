@@ -16,13 +16,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 
+import ru.snake.dbunit.generator.Message;
+import ru.snake.dbunit.generator.config.Configuration;
+import ru.snake.dbunit.generator.config.TableNameCase;
 import ru.snake.dbunit.generator.config.TypeMapping;
 import ru.snake.dbunit.generator.model.ConnectionSettings;
 import ru.snake.dbunit.generator.worker.mapper.AsciiStringMapper;
@@ -43,6 +45,8 @@ import ru.snake.dbunit.generator.worker.parse.QueryParser;
  */
 public final class BuildDatasetWorker extends SwingWorker<Result<String, String>, Void> {
 
+	private final Configuration config;
+
 	private final String queryText;
 
 	private final ConnectionSettings connectionSettings;
@@ -52,6 +56,8 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	/**
 	 * Create new worker to perform building data-set from given query list.
 	 *
+	 * @param config
+	 *            configuration settings
 	 * @param queryText
 	 *            string with queries
 	 * @param connectionSettings
@@ -60,10 +66,12 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	 *            output document
 	 */
 	public BuildDatasetWorker(
+		final Configuration config,
 		final String queryText,
 		final ConnectionSettings connectionSettings,
 		final Document outputDocument
 	) {
+		this.config = config;
 		this.queryText = queryText;
 		this.connectionSettings = connectionSettings;
 		this.outputDocument = outputDocument;
@@ -78,7 +86,7 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 		}
 
 		for (Query query : queries) {
-			if (query.getTableName() == null) {
+			if (getQueryTableName(query) == null) {
 				StringBuilder builder = new StringBuilder();
 				builder.append("Table for query not found. ");
 				builder.append("Use single line comment (`-- schema.table`) to define table name. ");
@@ -112,7 +120,11 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 			try (Connection connection = DriverManager.getConnection(connectionUrl);
 					Statement statement = connection.createStatement()) {
 				for (Query query : queries) {
-					String tableData = getTableDataset(statement, query.getQueryText(), query.getTableName());
+					if (isDummyTable(query)) {
+						continue;
+					}
+
+					String tableData = getTableDataset(statement, query);
 
 					if (!isFirst) {
 						dataset.append("\n");
@@ -131,24 +143,42 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	}
 
 	/**
+	 * Returns true if this query table name is the same as dummy table name in
+	 * configuration.
+	 *
+	 * @param query
+	 *            query
+	 * @return true if name is dummy
+	 */
+	private boolean isDummyTable(final Query query) {
+		String tableName = getQueryTableName(query);
+		String dummyName = config.getDummyTableName();
+
+		if (dummyName == null) {
+			return false;
+		}
+
+		return tableName.equals(dummyName);
+	}
+
+	/**
 	 * Generate and result XML data set for single query.
 	 *
 	 * @param statement
 	 *            JDBC statement
 	 * @param query
-	 *            query string
-	 * @param tableName
-	 *            table name
+	 *            query
 	 * @return string with table data set
 	 * @throws SQLException
 	 *             if error occurred
 	 */
-	private String getTableDataset(final Statement statement, final String query, final String tableName)
-			throws SQLException {
+	private String getTableDataset(final Statement statement, final Query query) throws SQLException {
 		StringBuilder tablrDatabaset = new StringBuilder();
 		Set<String> distinctRows = new HashSet<String>();
+		String queryString = query.getQueryText();
+		String tableName = getQueryTableName(query);
 
-		try (ResultSet resultSet = statement.executeQuery(query)) {
+		try (ResultSet resultSet = statement.executeQuery(queryString)) {
 			List<ColumnMapper> mappers = getMappers(resultSet);
 
 			while (resultSet.next()) {
@@ -165,6 +195,34 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 		}
 
 		return tablrDatabaset.toString();
+	}
+
+	/**
+	 * Returns query table name with expected in configuration case. If case not
+	 * defined - table name will not be changed.
+	 *
+	 * @param query
+	 *            query
+	 * @return table name
+	 */
+	private String getQueryTableName(final Query query) {
+		String tableName = query.getTableName();
+		TableNameCase nameCase = config.getTableNameCase();
+
+		if (nameCase == null) {
+			return tableName;
+		}
+
+		switch (nameCase) {
+		case UPPER:
+			return tableName.toUpperCase();
+
+		case LOWER:
+			return tableName.toLowerCase();
+
+		default:
+			throw new IllegalArgumentException("Unexpected table case: " + nameCase);
+		}
 	}
 
 	/**
@@ -329,7 +387,7 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 				this.outputDocument.insertString(0, result.getValue(), attributes);
 			}
 		} catch (BadLocationException e) {
-			showError(e);
+			Message.showError(e);
 		}
 	}
 
@@ -337,6 +395,7 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	 * Unroll exception messages to multi-line string.
 	 *
 	 * @param exception
+	 *            exception
 	 * @return formatted message
 	 */
 	private String unrollMessages(final Exception exception) {
@@ -357,16 +416,6 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 		}
 
 		return builder.toString();
-	}
-
-	/**
-	 * Show exception message dialog.
-	 *
-	 * @param e
-	 *            exception
-	 */
-	private void showError(final Exception e) {
-		JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), null, JOptionPane.ERROR_MESSAGE);
 	}
 
 }
