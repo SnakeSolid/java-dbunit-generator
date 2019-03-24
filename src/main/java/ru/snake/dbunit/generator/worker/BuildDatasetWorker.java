@@ -29,6 +29,7 @@ import ru.snake.dbunit.generator.worker.mapper.ColumnMapper;
 import ru.snake.dbunit.generator.worker.mapper.DummyStringMapper;
 import ru.snake.dbunit.generator.worker.mapper.HexBytesMapper;
 import ru.snake.dbunit.generator.worker.mapper.Utf8StringMapper;
+import ru.snake.dbunit.generator.worker.parse.QueryParser;
 
 /**
  * Background worker. Worker read queries from text, executes every query using
@@ -68,7 +69,7 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 
 	@Override
 	protected Result<String, String> doInBackground() throws Exception {
-		List<Query> queries = new QuerySplitter(this.queryText).split();
+		List<Query> queries = QueryParser.parse(this.queryText);
 
 		for (Query query : queries) {
 			if (query.getTableName() == null) {
@@ -76,7 +77,7 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 				builder.append("Table for query not found. ");
 				builder.append("Use single line comment (`-- schema.table`) to define table name. ");
 				builder.append("Query:\n");
-				builder.append(query.getQuery());
+				builder.append(query.getQueryText());
 
 				return Result.error(builder.toString());
 			}
@@ -105,7 +106,7 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 			try (Connection connection = DriverManager.getConnection(connectionUrl);
 					Statement statement = connection.createStatement()) {
 				for (Query query : queries) {
-					String tableData = getTableDataset(statement, query.getQuery(), query.getTableName());
+					String tableData = getTableDataset(statement, query.getQueryText(), query.getTableName());
 
 					if (!isFirst) {
 						dataset.append("\n");

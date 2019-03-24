@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
  * @author snake
  *
  */
-public class ConfigNotFoundException extends Exception {
+public final class ConfigNotFoundException extends Exception {
 
 	private static final long serialVersionUID = 5808218890268877671L;
 
@@ -18,7 +18,7 @@ public class ConfigNotFoundException extends Exception {
 	 * @param exception
 	 *            inner exception
 	 */
-	public ConfigNotFoundException(FileNotFoundException exception) {
+	public ConfigNotFoundException(final FileNotFoundException exception) {
 		super(exception);
 	}
 

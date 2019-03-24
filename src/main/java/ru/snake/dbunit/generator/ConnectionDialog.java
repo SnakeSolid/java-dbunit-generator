@@ -19,7 +19,15 @@ import ru.snake.dbunit.generator.model.ConnectionParametersTableModel;
 import ru.snake.dbunit.generator.model.ConnectionSettings;
 import ru.snake.dbunit.generator.model.DriverListModel;
 
-public class ConnectionDialog extends JDialog {
+/**
+ * Connection settings dialog.
+ *
+ * @author snake
+ *
+ */
+public final class ConnectionDialog extends JDialog {
+
+	private static final long serialVersionUID = -5094451147263755246L;
 
 	private final Configuration config;
 
@@ -66,16 +74,16 @@ public class ConnectionDialog extends JDialog {
 		JLabel parametersLabel = new JLabel("Parameters:");
 		JTable parametersTable = new JTable(parametersModel);
 		JScrollPane parameterScroll = new JScrollPane(parametersTable);
-		JButton saveButton = new JButton(
-			new PrepareConnectionAction(
-				this,
-				this.config,
-				driverListModel,
-				parametersModel,
-				this::setSelectedConnection
-			)
+		PrepareConnectionAction connectionAction = new PrepareConnectionAction(
+			this,
+			this.config,
+			driverListModel,
+			parametersModel,
+			this::setSelectedConnection
 		);
-		JButton cancelButton = new JButton(new CloseDialogAction(this));
+		CloseDialogAction closeAction = new CloseDialogAction(this);
+		JButton saveButton = new JButton(connectionAction);
+		JButton cancelButton = new JButton(closeAction);
 
 		// @formatter:off
 		layout.setHorizontalGroup(
@@ -106,7 +114,13 @@ public class ConnectionDialog extends JDialog {
 		setLayout(layout);
 	}
 
-	private void setSelectedConnection(ConnectionSettings selectedConnection) {
+	/**
+	 * Set selected connection. This method called from action.
+	 *
+	 * @param selectedConnection
+	 *            selected connection
+	 */
+	private void setSelectedConnection(final ConnectionSettings selectedConnection) {
 		this.selectedConnection = selectedConnection;
 	}
 

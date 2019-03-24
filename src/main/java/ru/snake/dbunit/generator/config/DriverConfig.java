@@ -10,7 +10,7 @@ import java.util.Map;
  * @author snake
  *
  */
-public class DriverConfig {
+public final class DriverConfig {
 
 	private String driverPath;
 

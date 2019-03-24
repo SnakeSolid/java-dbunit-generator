@@ -6,7 +6,7 @@ package ru.snake.dbunit.generator.config;
  * @author snake
  *
  */
-public class FontConfig {
+public final class FontConfig {
 
 	private static final int DEFAULT_SIZE = 12;
 

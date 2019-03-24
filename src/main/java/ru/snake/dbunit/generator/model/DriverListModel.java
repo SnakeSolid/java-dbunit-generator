@@ -17,6 +17,8 @@ import ru.snake.dbunit.generator.config.Configuration;
  */
 public final class DriverListModel extends DefaultComboBoxModel<String> {
 
+	private static final long serialVersionUID = 2451726644570331613L;
+
 	/**
 	 * Create model from configuration.
 	 *

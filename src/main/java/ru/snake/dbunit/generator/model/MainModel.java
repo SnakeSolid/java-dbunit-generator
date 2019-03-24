@@ -8,6 +8,13 @@ import javax.swing.text.PlainDocument;
 
 import ru.snake.dbunit.generator.config.Configuration;
 
+/**
+ * Main frame internale state model. Contains connections settings and text
+ * documents from query and result data set.
+ *
+ * @author snake
+ *
+ */
 public class MainModel {
 
 	private final Configuration config;
@@ -26,7 +33,7 @@ public class MainModel {
 	 * @param config
 	 *            configuration settings
 	 */
-	public MainModel(Configuration config) {
+	public MainModel(final Configuration config) {
 		this.config = config;
 
 		this.queryDocument = new PlainDocument();
@@ -35,6 +42,11 @@ public class MainModel {
 		this.currentConnection = null;
 	}
 
+	/**
+	 * Returns current configuration.
+	 *
+	 * @return configuration
+	 */
 	public Configuration getConfig() {
 		return config;
 	}

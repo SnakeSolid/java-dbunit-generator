@@ -5,6 +5,13 @@ import java.util.Map;
 
 import ru.snake.dbunit.generator.config.TypeMapping;
 
+/**
+ * Connection settings from worker. Settings contain field mappings and driver
+ * settings.
+ *
+ * @author snake
+ *
+ */
 public final class ConnectionSettings {
 
 	private final String driverPath;

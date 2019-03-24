@@ -8,7 +8,7 @@ import java.io.IOException;
  * @author snake
  *
  */
-public class ReadConfigException extends Exception {
+public final class ReadConfigException extends Exception {
 
 	private static final long serialVersionUID = 5954651350287486384L;
 
@@ -18,7 +18,7 @@ public class ReadConfigException extends Exception {
 	 * @param exception
 	 *            inner exception
 	 */
-	public ReadConfigException(IOException exception) {
+	public ReadConfigException(final IOException exception) {
 		super(exception);
 	}
 

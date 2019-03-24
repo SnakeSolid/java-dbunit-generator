@@ -10,7 +10,25 @@ import java.awt.Font;
  */
 public enum FontStyle {
 
-	PLAIN, BOLD, ITALIC, BOLD_ITALIC;
+	/**
+	 * Default font weight.
+	 */
+	PLAIN,
+
+	/**
+	 * Bold font.
+	 */
+	BOLD,
+
+	/**
+	 * Italic font.
+	 */
+	ITALIC,
+
+	/**
+	 * Bold and italic font.
+	 */
+	BOLD_ITALIC;
 
 	/**
 	 * Convert font style to AWK compatible integer value.

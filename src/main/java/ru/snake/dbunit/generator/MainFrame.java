@@ -14,6 +14,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
+import javax.swing.UIManager;
 import javax.swing.text.Document;
 
 import ru.snake.dbunit.generator.action.ExecuteQueryAction;
@@ -28,6 +29,14 @@ import ru.snake.dbunit.generator.model.MainModel;
  *
  */
 public final class MainFrame extends JFrame {
+
+	private static final long serialVersionUID = 1006049148286250839L;
+
+	private static final int PREFERRED_WIDTH = 800;
+
+	private static final int PREFERRED_HEIGHT = 600;
+
+	private static final int BORDER_PADDING = 8;
 
 	private static final int DEFAULT_DIVIDER_LOCATION = 350;
 
@@ -77,7 +86,7 @@ public final class MainFrame extends JFrame {
 		setJMenuBar(menuBar);
 		add(toolBar, BorderLayout.PAGE_START);
 		add(editors, BorderLayout.CENTER);
-		setPreferredSize(new Dimension(800, 600));
+		setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 	}
 
 	/**
@@ -105,6 +114,7 @@ public final class MainFrame extends JFrame {
 	 */
 	private JToolBar createToolBar() {
 		JToolBar toolBar = new JToolBar(JToolBar.HORIZONTAL);
+		toolBar.setFloatable(false);
 		toolBar.add(selectConnectionAction);
 		toolBar.add(executeQueryAction);
 
@@ -130,6 +140,7 @@ public final class MainFrame extends JFrame {
 
 		Document datasetDocument = this.model.getDatasetDocument();
 		JTextArea datasetText = new JTextArea(datasetDocument);
+		datasetText.setBackground(UIManager.getColor("control"));
 		datasetText.setFont(font);
 		datasetText.setEditable(false);
 
@@ -140,7 +151,8 @@ public final class MainFrame extends JFrame {
 		);
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryScroll, datasetScroll);
-		splitPane.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+		splitPane
+			.setBorder(BorderFactory.createEmptyBorder(BORDER_PADDING, BORDER_PADDING, BORDER_PADDING, BORDER_PADDING));
 		splitPane.setDividerLocation(DEFAULT_DIVIDER_LOCATION);
 		splitPane.setOneTouchExpandable(true);
 
