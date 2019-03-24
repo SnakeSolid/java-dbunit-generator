@@ -17,6 +17,7 @@ import javax.swing.JToolBar;
 import javax.swing.UIManager;
 import javax.swing.text.Document;
 
+import ru.snake.dbunit.generator.action.CloseFrameAction;
 import ru.snake.dbunit.generator.action.ExecuteQueryAction;
 import ru.snake.dbunit.generator.action.SelectConnectionAction;
 import ru.snake.dbunit.generator.config.Configuration;
@@ -48,6 +49,8 @@ public final class MainFrame extends JFrame {
 
 	private Action executeQueryAction;
 
+	private Action closeFrameAction;
+
 	/**
 	 * Creates new frame instance with given configuration settings.
 	 *
@@ -73,6 +76,7 @@ public final class MainFrame extends JFrame {
 	private void createActions() {
 		selectConnectionAction = new SelectConnectionAction(this, this.config);
 		executeQueryAction = new ExecuteQueryAction(this, this.config);
+		closeFrameAction = new CloseFrameAction(this);
 	}
 
 	/**
@@ -99,7 +103,7 @@ public final class MainFrame extends JFrame {
 		commandMenu.add(selectConnectionAction);
 		commandMenu.add(executeQueryAction);
 		commandMenu.addSeparator();
-		commandMenu.add("Exit");
+		commandMenu.add(closeFrameAction);
 
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(commandMenu);
@@ -117,6 +121,8 @@ public final class MainFrame extends JFrame {
 		toolBar.setFloatable(false);
 		toolBar.add(selectConnectionAction);
 		toolBar.add(executeQueryAction);
+		toolBar.addSeparator();
+		toolBar.add(closeFrameAction);
 
 		return toolBar;
 	}
