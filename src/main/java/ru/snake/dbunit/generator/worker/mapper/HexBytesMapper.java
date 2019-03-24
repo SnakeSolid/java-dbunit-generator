@@ -44,8 +44,8 @@ public final class HexBytesMapper implements ColumnMapper {
 		StringBuilder builder = new StringBuilder(2 * value.length);
 
 		for (byte b : value) {
-			builder.append(Character.forDigit(b >> 4, 16));
-			builder.append(Character.forDigit(b & 0x0f, 16));
+			builder.append(Character.forDigit((b >> 4) & 0x0f, 16));
+			builder.append(Character.forDigit((b >> 0) & 0x0f, 16));
 		}
 
 		return builder.toString();
