@@ -47,7 +47,11 @@
 		<module name="IllegalInstantiation" />
 		<module name="InnerAssignment" />
 		<module name="InterfaceIsType" />
-		<module name="JavadocMethod" />
+
+		<module name="JavadocMethod">
+			<property name="allowedAnnotations" value="Test" />
+		</module>
+
 		<module name="JavadocStyle" />
 		<module name="JavadocType" />
 
