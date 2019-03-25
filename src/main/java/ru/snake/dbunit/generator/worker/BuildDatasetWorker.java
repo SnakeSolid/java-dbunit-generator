@@ -112,6 +112,10 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 			}
 		}
 
+		if (queries.isEmpty()) {
+			return Result.error("Dataset must have at least one executable 	query.");
+		}
+
 		String driverClassName = connectionSettings.getDriverClass();
 		String connectionUrl = connectionSettings.getUrl();
 		URL url = new URL(connectionSettings.getDriverPath());
