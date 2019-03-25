@@ -34,6 +34,8 @@ import ru.snake.dbunit.generator.worker.mapper.DummyStringMapper;
 import ru.snake.dbunit.generator.worker.mapper.HexBytesMapper;
 import ru.snake.dbunit.generator.worker.mapper.Utf8StringMapper;
 import ru.snake.dbunit.generator.worker.parse.QueryParser;
+import ru.snake.dbunit.generator.worker.query.Query;
+import ru.snake.dbunit.generator.worker.query.QueryTemplate;
 
 /**
  * Background worker. Worker read queries from text, executes every query using
@@ -79,21 +81,34 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 
 	@Override
 	protected Result<String, String> doInBackground() throws Exception {
-		List<Query> queries = QueryParser.parse(this.queryText);
+		List<Query> allQueries = QueryParser.parse(this.queryText);
+		List<Query> queries = new ArrayList<>();
 
-		if (queries.isEmpty()) {
+		if (allQueries.isEmpty()) {
 			return Result.error("Dataset must have at least one query.");
 		}
 
-		for (Query query : queries) {
-			if (getQueryTableName(query) == null) {
+		for (Query query : allQueries) {
+			if (query.getTableName() == null) {
 				StringBuilder builder = new StringBuilder();
-				builder.append("Table for query not found. ");
+				builder.append("Table for query not defined. ");
 				builder.append("Use single line comment (`-- schema.table`) to define table name. ");
 				builder.append("Query:\n");
 				builder.append(query.getQueryText());
 
 				return Result.error(builder.toString());
+			} else if (isSkippedQuery(query)) {
+				continue;
+			} else if (isTemplateQuery(query)) {
+				Result<List<Query>, String> generatedResult = QueryTemplate.generate(query);
+
+				if (generatedResult.isError()) {
+					return Result.error(generatedResult.getError());
+				}
+
+				queries.addAll(generatedResult.getValue());
+			} else {
+				queries.add(query);
 			}
 		}
 
@@ -120,7 +135,7 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 			try (Connection connection = DriverManager.getConnection(connectionUrl);
 					Statement statement = connection.createStatement()) {
 				for (Query query : queries) {
-					if (isDummyTable(query)) {
+					if (isSkippedQuery(query)) {
 						continue;
 					}
 
@@ -143,22 +158,41 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	}
 
 	/**
-	 * Returns true if this query table name is the same as dummy table name in
-	 * configuration.
+	 * Returns true if this query table name starts with the same as skip table
+	 * name in configuration.
 	 *
 	 * @param query
 	 *            query
 	 * @return true if name is dummy
 	 */
-	private boolean isDummyTable(final Query query) {
+	private boolean isTemplateQuery(final Query query) {
 		String tableName = getQueryTableName(query);
-		String dummyName = config.getDummyTableName();
+		String templateName = config.getTemplateTableName();
+
+		if (templateName == null) {
+			return false;
+		}
+
+		return tableName.equals(templateName);
+	}
+
+	/**
+	 * Returns true if this query table name starts with the same as skip table
+	 * name in configuration.
+	 *
+	 * @param query
+	 *            query
+	 * @return true if name is dummy
+	 */
+	private boolean isSkippedQuery(final Query query) {
+		String tableName = getQueryTableName(query);
+		String dummyName = config.getSkipTablePrefix();
 
 		if (dummyName == null) {
 			return false;
 		}
 
-		return tableName.equals(dummyName);
+		return tableName.startsWith(dummyName);
 	}
 
 	/**

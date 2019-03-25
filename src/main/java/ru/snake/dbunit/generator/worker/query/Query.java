@@ -1,4 +1,4 @@
-package ru.snake.dbunit.generator.worker;
+package ru.snake.dbunit.generator.worker.query;
 
 /**
  * Data transfer object for single query and table name.

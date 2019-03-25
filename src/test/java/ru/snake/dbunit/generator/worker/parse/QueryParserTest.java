@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import ru.snake.dbunit.generator.worker.Query;
+import ru.snake.dbunit.generator.worker.query.Query;
 
 /**
  *

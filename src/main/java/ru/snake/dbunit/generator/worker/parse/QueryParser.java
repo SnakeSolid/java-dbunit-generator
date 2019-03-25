@@ -3,7 +3,7 @@ package ru.snake.dbunit.generator.worker.parse;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.snake.dbunit.generator.worker.Query;
+import ru.snake.dbunit.generator.worker.query.Query;
 
 /**
  * Split given text to queries.

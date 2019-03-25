@@ -13,7 +13,9 @@ public final class Configuration {
 
 	private FontConfig font;
 
-	private String dummyTableName;
+	private String templateTableName;
+
+	private String skipTablePrefix;
 
 	private TableNameCase tableNameCase;
 
@@ -24,7 +26,8 @@ public final class Configuration {
 	 */
 	public Configuration() {
 		this.font = new FontConfig();
-		this.dummyTableName = null;
+		this.templateTableName = null;
+		this.skipTablePrefix = null;
 		this.tableNameCase = null;
 		this.drivers = new HashMap<>();
 	}
@@ -39,12 +42,21 @@ public final class Configuration {
 	}
 
 	/**
-	 * Returns dummy table name.
+	 * Returns template table name.
 	 *
-	 * @return dummy table name
+	 * @return template table name
 	 */
-	public String getDummyTableName() {
-		return dummyTableName;
+	public String getTemplateTableName() {
+		return templateTableName;
+	}
+
+	/**
+	 * Returns skip query table name prefix.
+	 *
+	 * @return skip table name
+	 */
+	public String getSkipTablePrefix() {
+		return skipTablePrefix;
 	}
 
 	/**
@@ -67,8 +79,8 @@ public final class Configuration {
 
 	@Override
 	public String toString() {
-		return "Configuration [font=" + font + ", dummyTableName=" + dummyTableName + ", tableNameCase=" + tableNameCase
-				+ ", drivers=" + drivers + "]";
+		return "Configuration [font=" + font + ", templateTableName=" + templateTableName + ", skipTablePrefix="
+				+ skipTablePrefix + ", tableNameCase=" + tableNameCase + ", drivers=" + drivers + "]";
 	}
 
 }
