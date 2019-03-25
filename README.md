@@ -1,6 +1,43 @@
 # DBUnit generator
 
-Simple GUI application to generate DBUnit dataset from queries.
+Simple GUI application to generate DBUnit data set from queries.
+
+## Examples
+
+Input text example:
+
+```sql
+-- *
+select *
+from table_a as a
+  inner join table_b as b using ( id )
+where a.name = 'test' ;
+-- table_c
+select *
+from table_c
+where category = 2
+```
+
+First query will be used as template and split to two different queries:
+
+```sql
+-- table_a
+select a.*
+from table_a as a
+  inner join table_b as b using ( id )
+where a.name = 'test'
+```
+
+```sql
+-- table_b
+select b.*
+from table_a as a
+  inner join table_b as b using ( id )
+where a.name = 'test'
+```
+
+Both queries will be executed independently. Last query will be used as is.
+Result will contain three tables: `table_a`,  `table_b` and  `table_c`.
 
 ## Configuration
 
@@ -13,8 +50,11 @@ font: # font settings for query and result editors
   style: BOLD # Font style: PLAIN, BOLD, ITALIC or BOLD_ITALIC
   size: 14 # Font size in pixels
 
-# If defined this table name can be used to ignore some query.
-dummyTableName: "-"
+# If defined this table name will be used to use query as template.
+templateTableName: "*"
+
+# If defined this name prefix can be used to ignore queries.
+skipTablePrefix: "-"
 
 # Table name case change policy: UPPER or LOWER.
 # If defined table name will be changed to corresponding case.
