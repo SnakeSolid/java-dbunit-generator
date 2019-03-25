@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">
-			<level>WARN</level>
-			<onMatch>ACCEPT</onMatch>
-			<onMismatch>DENY</onMismatch>
-		</filter>
-
-		<encoder>
-			<pattern>%date{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %message%n</pattern>
-		</encoder>
-	</appender>
-
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>log/dbunit-generator.log</file>
 
@@ -32,7 +20,6 @@
 	</appender>
 
 	<root level="ALL">
-		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE" />
 	</root>
 </configuration>
