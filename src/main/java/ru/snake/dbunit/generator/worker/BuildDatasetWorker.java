@@ -11,9 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
@@ -130,11 +128,7 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 				return Result.error("Driver class " + driverClassName + " does not implement java.sql.Driver.");
 			}
 
-			StringBuilder dataset = new StringBuilder();
-			boolean isFirst = true;
-
-			dataset.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-			dataset.append("<dataset>\n");
+			DatasetBuilder datasetBuilder = new DatasetBuilder();
 
 			try (Connection connection = DriverManager.getConnection(connectionUrl);
 					Statement statement = connection.createStatement()) {
@@ -143,21 +137,11 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 						continue;
 					}
 
-					String tableData = getTableDataset(statement, query);
-
-					if (!isFirst) {
-						dataset.append("\n");
-					} else {
-						isFirst = false;
-					}
-
-					dataset.append(tableData);
+					fillQueryDataset(datasetBuilder, statement, query);
 				}
 			}
 
-			dataset.append("</dataset>\n");
-
-			return Result.ok(dataset.toString());
+			return Result.ok(datasetBuilder.build());
 		}
 	}
 
@@ -200,21 +184,23 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	}
 
 	/**
-	 * Generate and result XML data set for single query.
+	 * Executes given query and put all collected row to data set.
 	 *
+	 * @param datasetBuilder
+	 *            data set builder
 	 * @param statement
 	 *            JDBC statement
 	 * @param query
 	 *            query
-	 * @return string with table data set
 	 * @throws SQLException
 	 *             if error occurred
 	 */
-	private String getTableDataset(final Statement statement, final Query query) throws SQLException {
-		StringBuilder tablrDatabaset = new StringBuilder();
-		Set<String> distinctRows = new HashSet<String>();
+	private void fillQueryDataset(final DatasetBuilder datasetBuilder, final Statement statement, final Query query)
+			throws SQLException {
 		String queryString = query.getQueryText();
 		String tableName = getQueryTableName(query);
+
+		datasetBuilder.ensureTable(tableName);
 
 		try (ResultSet resultSet = statement.executeQuery(queryString)) {
 			List<ColumnMapper> mappers = getMappers(resultSet);
@@ -222,17 +208,9 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 			while (resultSet.next()) {
 				String tableRow = getTableRow(resultSet, tableName, mappers);
 
-				if (distinctRows.add(tableRow)) {
-					tablrDatabaset.append(tableRow);
-				}
+				datasetBuilder.pushRow(tableName, tableRow);
 			}
 		}
-
-		if (distinctRows.isEmpty()) {
-			return "    <" + tableName + " />\n";
-		}
-
-		return tablrDatabaset.toString();
 	}
 
 	/**
@@ -278,25 +256,17 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	 */
 	private String getTableRow(final ResultSet resultSet, final String tableName, final List<ColumnMapper> mappers)
 			throws SQLException {
-		StringBuilder tableData = new StringBuilder();
-		tableData.append("    <");
-		tableData.append(tableName);
+		TableRowBuilder builder = new TableRowBuilder(tableName);
 
 		for (ColumnMapper mapper : mappers) {
 			String value = mapper.map(resultSet);
 
 			if (value != null) {
-				tableData.append(" ");
-				tableData.append(mapper.getColumnName());
-				tableData.append("=\"");
-				tableData.append(escapeControlCharacters(value));
-				tableData.append("\"");
+				builder.push(mapper.getColumnName(), value);
 			}
 		}
 
-		tableData.append(" />\n");
-
-		return tableData.toString();
+		return builder.build();
 	}
 
 	/**
@@ -319,24 +289,6 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 
 			result.add(mapper);
 		}
-
-		return result;
-	}
-
-	/**
-	 * Escapes XML control characters from string.
-	 *
-	 * @param value
-	 *            value
-	 * @return XML safe value
-	 */
-	private Object escapeControlCharacters(final String value) {
-		String result = value;
-		result = result.replace("\"", "&quot;");
-		result = result.replace("&", "&amp;");
-		result = result.replace("'", "&apos;");
-		result = result.replace("<", "&lt;");
-		result = result.replace(">", "&gt;");
 
 		return result;
 	}
