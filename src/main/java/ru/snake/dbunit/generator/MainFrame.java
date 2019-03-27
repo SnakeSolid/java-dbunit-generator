@@ -8,6 +8,7 @@ import java.awt.event.MouseListener;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -16,10 +17,16 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.Document;
 
 import ru.snake.dbunit.generator.action.CloseFrameAction;
 import ru.snake.dbunit.generator.action.ExecuteQueryAction;
+import ru.snake.dbunit.generator.action.NewFileAction;
+import ru.snake.dbunit.generator.action.OpenFileAction;
+import ru.snake.dbunit.generator.action.SaveAsFileAction;
+import ru.snake.dbunit.generator.action.SaveFileAction;
 import ru.snake.dbunit.generator.action.SelectConnectionAction;
 import ru.snake.dbunit.generator.config.Configuration;
 import ru.snake.dbunit.generator.listener.TextEditorMouseListener;
@@ -46,6 +53,14 @@ public final class MainFrame extends JFrame {
 	private final Configuration config;
 
 	private final MainModel model;
+
+	private Action newFileAction;
+
+	private Action openFileAction;
+
+	private Action saveFileAction;
+
+	private Action saveAsFileAction;
 
 	private Action selectConnectionAction;
 
@@ -76,6 +91,15 @@ public final class MainFrame extends JFrame {
 	 * Creates and initialize all actions.
 	 */
 	private void createActions() {
+		JFileChooser chooser = new JFileChooser();
+		FileFilter filter = new FileNameExtensionFilter("Query files", "sql", "txt");
+		chooser.addChoosableFileFilter(filter);
+		chooser.setFileFilter(filter);
+
+		newFileAction = new NewFileAction(this, model);
+		openFileAction = new OpenFileAction(this, model, chooser);
+		saveFileAction = new SaveFileAction(this, model, chooser);
+		saveAsFileAction = new SaveAsFileAction(this, model, chooser);
 		selectConnectionAction = new SelectConnectionAction(this, this.config);
 		executeQueryAction = new ExecuteQueryAction(this, this.config);
 		closeFrameAction = new CloseFrameAction(this);
@@ -101,14 +125,23 @@ public final class MainFrame extends JFrame {
 	 * @return menu bar
 	 */
 	private JMenuBar createMenuBar() {
-		JMenu commandMenu = new JMenu("Command");
-		commandMenu.add(selectConnectionAction);
-		commandMenu.add(executeQueryAction);
-		commandMenu.addSeparator();
-		commandMenu.add(closeFrameAction);
+		JMenu fileMenu = new JMenu("File");
+		fileMenu.setMnemonic('F');
+		fileMenu.add(newFileAction);
+		fileMenu.add(openFileAction);
+		fileMenu.add(saveFileAction);
+		fileMenu.add(saveAsFileAction);
+		fileMenu.addSeparator();
+		fileMenu.add(closeFrameAction);
+
+		JMenu connectionMenu = new JMenu("Connection");
+		connectionMenu.setMnemonic('C');
+		connectionMenu.add(selectConnectionAction);
+		connectionMenu.add(executeQueryAction);
 
 		JMenuBar menuBar = new JMenuBar();
-		menuBar.add(commandMenu);
+		menuBar.add(fileMenu);
+		menuBar.add(connectionMenu);
 
 		return menuBar;
 	}
@@ -121,10 +154,12 @@ public final class MainFrame extends JFrame {
 	private JToolBar createToolBar() {
 		JToolBar toolBar = new JToolBar(JToolBar.HORIZONTAL);
 		toolBar.setFloatable(false);
+		toolBar.add(newFileAction);
+		toolBar.add(openFileAction);
+		toolBar.add(saveFileAction);
+		toolBar.addSeparator();
 		toolBar.add(selectConnectionAction);
 		toolBar.add(executeQueryAction);
-		toolBar.addSeparator();
-		toolBar.add(closeFrameAction);
 
 		return toolBar;
 	}

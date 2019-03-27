@@ -1,5 +1,12 @@
 package ru.snake.dbunit.generator.model;
 
+/**
+ * Listener will be called when connection settings modified.
+ *
+ * @author snake
+ *
+ */
+@FunctionalInterface
 public interface ConnectionListener {
 
 	/**
@@ -10,6 +17,6 @@ public interface ConnectionListener {
 	 * @param settings
 	 *            new settings
 	 */
-	public void connectionChanged(MainModel model, ConnectionSettings settings);
+	void connectionChanged(MainModel model, ConnectionSettings settings);
 
 }
