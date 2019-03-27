@@ -92,11 +92,11 @@ public final class MainFrame extends JFrame {
 	 */
 	private void createActions() {
 		JFileChooser chooser = new JFileChooser();
-		FileFilter filter = new FileNameExtensionFilter("Query files", "sql", "txt");
+		FileFilter filter = new FileNameExtensionFilter("Query files (*.sql; *.txt)", "sql", "txt");
 		chooser.addChoosableFileFilter(filter);
 		chooser.setFileFilter(filter);
 
-		newFileAction = new NewFileAction(this, model);
+		newFileAction = new NewFileAction(this, model, chooser);
 		openFileAction = new OpenFileAction(this, model, chooser);
 		saveFileAction = new SaveFileAction(this, model, chooser);
 		saveAsFileAction = new SaveAsFileAction(this, model, chooser);

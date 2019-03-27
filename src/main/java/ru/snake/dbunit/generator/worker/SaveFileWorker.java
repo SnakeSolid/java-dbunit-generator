@@ -3,6 +3,7 @@ package ru.snake.dbunit.generator.worker;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
@@ -23,6 +24,8 @@ public final class SaveFileWorker extends SwingWorker<Void, Void> {
 
 	private final File file;
 
+	private final Optional<Runnable> callback;
+
 	/**
 	 * Create new save worker.
 	 *
@@ -34,6 +37,23 @@ public final class SaveFileWorker extends SwingWorker<Void, Void> {
 	public SaveFileWorker(final MainModel model, final File file) {
 		this.model = model;
 		this.file = file;
+		this.callback = Optional.empty();
+	}
+
+	/**
+	 * Create new save worker.
+	 *
+	 * @param model
+	 *            model
+	 * @param file
+	 *            file
+	 * @param callback
+	 *            callback
+	 */
+	public SaveFileWorker(final MainModel model, final File file, final Runnable callback) {
+		this.model = model;
+		this.file = file;
+		this.callback = Optional.of(callback);
 	}
 
 	@Override
@@ -55,6 +75,7 @@ public final class SaveFileWorker extends SwingWorker<Void, Void> {
 			get();
 
 			model.setQueryStateSaved(file);
+			callback.ifPresent(Runnable::run);
 		} catch (InterruptedException | ExecutionException e) {
 			Message.showError(e);
 		}
