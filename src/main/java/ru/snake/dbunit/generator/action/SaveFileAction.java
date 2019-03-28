@@ -10,6 +10,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -27,7 +28,11 @@ import ru.snake.dbunit.generator.worker.SaveFileWorker;
  */
 public final class SaveFileAction extends AbstractAction implements Action, EditorStateListener {
 
+	private final JFrame frame;
+
 	private final MainModel model;
+
+	private final JFileChooser chooser;
 
 	/**
 	 * Create new open file action.
@@ -40,7 +45,9 @@ public final class SaveFileAction extends AbstractAction implements Action, Edit
 	 *            file chooser
 	 */
 	public SaveFileAction(final JFrame frame, final MainModel model, final JFileChooser chooser) {
+		this.frame = frame;
 		this.model = model;
+		this.chooser = chooser;
 
 		Icon smallIcon = new ImageIcon(ClassLoader.getSystemResource("icons/save-x16.png"));
 		Icon largeIcon = new ImageIcon(ClassLoader.getSystemResource("icons/save-x24.png"));
@@ -59,17 +66,47 @@ public final class SaveFileAction extends AbstractAction implements Action, Edit
 	@Override
 	public void actionPerformed(final ActionEvent e) {
 		if (model.hasFile()) {
-			File file = model.getFile();
-			Document document = model.getQueryDocument();
-			int length = document.getLength();
+			saveContent(model.getFile());
+		} else {
+			int result = chooser.showSaveDialog(frame);
 
-			try {
-				String text = document.getText(0, length);
-				SaveFileWorker worker = new SaveFileWorker(model, file, text);
-				worker.execute();
-			} catch (BadLocationException exception) {
-				Message.showError(exception);
+			if (result == JFileChooser.APPROVE_OPTION) {
+				File file = chooser.getSelectedFile();
+
+				if (file.exists()) {
+					result = JOptionPane.showConfirmDialog(
+						frame,
+						"This file exists. Do you want to overwrite it?",
+						"File exists",
+						JOptionPane.YES_NO_OPTION
+					);
+
+					if (result == JOptionPane.YES_OPTION) {
+						saveContent(file);
+					}
+				} else {
+					saveContent(file);
+				}
 			}
+		}
+	}
+
+	/**
+	 * Save editor content to file.
+	 *
+	 * @param file
+	 *            file
+	 */
+	private void saveContent(final File file) {
+		Document document = model.getQueryDocument();
+		int length = document.getLength();
+
+		try {
+			String text = document.getText(0, length);
+			SaveFileWorker worker = new SaveFileWorker(model, file, text);
+			worker.execute();
+		} catch (BadLocationException e) {
+			Message.showError(e);
 		}
 	}
 
