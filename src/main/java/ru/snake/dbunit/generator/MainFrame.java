@@ -104,7 +104,7 @@ public final class MainFrame extends JFrame {
 		saveAsFileAction = new SaveAsFileAction(this, model, chooser);
 		selectConnectionAction = new SelectConnectionAction(this, this.config);
 		executeQueryAction = new ExecuteQueryAction(this, this.config);
-		closeFrameAction = new CloseFrameAction(this);
+		closeFrameAction = new CloseFrameAction(this, model, chooser);
 	}
 
 	/**
