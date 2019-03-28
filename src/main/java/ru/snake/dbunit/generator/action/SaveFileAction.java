@@ -11,7 +11,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
+import ru.snake.dbunit.generator.Message;
 import ru.snake.dbunit.generator.model.EditorStateListener;
 import ru.snake.dbunit.generator.model.MainModel;
 import ru.snake.dbunit.generator.worker.SaveFileWorker;
@@ -57,8 +60,16 @@ public final class SaveFileAction extends AbstractAction implements Action, Edit
 	public void actionPerformed(final ActionEvent e) {
 		if (model.hasFile()) {
 			File file = model.getFile();
-			SaveFileWorker worker = new SaveFileWorker(model, file);
-			worker.execute();
+			Document document = model.getQueryDocument();
+			int length = document.getLength();
+
+			try {
+				String text = document.getText(0, length);
+				SaveFileWorker worker = new SaveFileWorker(model, file, text);
+				worker.execute();
+			} catch (BadLocationException exception) {
+				Message.showError(exception);
+			}
 		}
 	}
 

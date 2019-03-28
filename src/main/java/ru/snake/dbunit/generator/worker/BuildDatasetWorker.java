@@ -402,7 +402,7 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 
 		for (Throwable suppressed : exception.getSuppressed()) {
 			builder.append("\n  Suppressed > ");
-			builder.append(suppressed.getSuppressed());
+			builder.append(suppressed.getLocalizedMessage());
 		}
 
 		return builder.toString();

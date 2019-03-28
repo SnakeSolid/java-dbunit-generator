@@ -12,7 +12,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
+import ru.snake.dbunit.generator.Message;
 import ru.snake.dbunit.generator.model.MainModel;
 import ru.snake.dbunit.generator.worker.LoadFileWorker;
 import ru.snake.dbunit.generator.worker.SaveFileWorker;
@@ -107,8 +110,16 @@ public final class OpenFileAction extends AbstractAction implements Action {
 	 *            file
 	 */
 	private void saveAndLoadContent(final File file) {
-		SaveFileWorker worker = new SaveFileWorker(model, file, this::loadContent);
-		worker.execute();
+		Document document = model.getQueryDocument();
+		int length = document.getLength();
+
+		try {
+			String text = document.getText(0, length);
+			SaveFileWorker worker = new SaveFileWorker(model, file, text, this::loadContent);
+			worker.execute();
+		} catch (BadLocationException e) {
+			Message.showError(e);
+		}
 	}
 
 	/**

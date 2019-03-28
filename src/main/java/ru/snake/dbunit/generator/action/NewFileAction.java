@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 import ru.snake.dbunit.generator.Message;
 import ru.snake.dbunit.generator.model.MainModel;
@@ -108,8 +109,16 @@ public final class NewFileAction extends AbstractAction implements Action {
 	 *            file
 	 */
 	private void saveAndClearContent(final File file) {
-		SaveFileWorker worker = new SaveFileWorker(model, file, this::clearContent);
-		worker.execute();
+		Document document = model.getQueryDocument();
+		int length = document.getLength();
+
+		try {
+			String text = document.getText(0, length);
+			SaveFileWorker worker = new SaveFileWorker(model, file, text, this::clearContent);
+			worker.execute();
+		} catch (BadLocationException e) {
+			Message.showError(e);
+		}
 	}
 
 	/**

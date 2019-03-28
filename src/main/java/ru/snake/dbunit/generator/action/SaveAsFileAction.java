@@ -9,7 +9,10 @@ import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
+import ru.snake.dbunit.generator.Message;
 import ru.snake.dbunit.generator.model.MainModel;
 import ru.snake.dbunit.generator.worker.SaveFileWorker;
 
@@ -54,8 +57,16 @@ public final class SaveAsFileAction extends AbstractAction implements Action {
 
 		if (result == JFileChooser.APPROVE_OPTION) {
 			File file = chooser.getSelectedFile();
-			SaveFileWorker worker = new SaveFileWorker(model, file);
-			worker.execute();
+			Document document = model.getQueryDocument();
+			int length = document.getLength();
+
+			try {
+				String text = document.getText(0, length);
+				SaveFileWorker worker = new SaveFileWorker(model, file, text);
+				worker.execute();
+			} catch (BadLocationException exception) {
+				Message.showError(exception);
+			}
 		}
 	}
 

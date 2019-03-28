@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
-import javax.swing.text.Document;
 
 import ru.snake.dbunit.generator.Message;
 import ru.snake.dbunit.generator.model.MainModel;
@@ -24,6 +23,8 @@ public final class SaveFileWorker extends SwingWorker<Void, Void> {
 
 	private final File file;
 
+	private final String text;
+
 	private final Optional<Runnable> callback;
 
 	/**
@@ -33,10 +34,13 @@ public final class SaveFileWorker extends SwingWorker<Void, Void> {
 	 *            model
 	 * @param file
 	 *            file
+	 * @param text
+	 *            text
 	 */
-	public SaveFileWorker(final MainModel model, final File file) {
+	public SaveFileWorker(final MainModel model, final File file, final String text) {
 		this.model = model;
 		this.file = file;
+		this.text = text;
 		this.callback = Optional.empty();
 	}
 
@@ -47,21 +51,20 @@ public final class SaveFileWorker extends SwingWorker<Void, Void> {
 	 *            model
 	 * @param file
 	 *            file
+	 * @param text
+	 *            text
 	 * @param callback
 	 *            callback
 	 */
-	public SaveFileWorker(final MainModel model, final File file, final Runnable callback) {
+	public SaveFileWorker(final MainModel model, final File file, final String text, final Runnable callback) {
 		this.model = model;
 		this.file = file;
+		this.text = text;
 		this.callback = Optional.of(callback);
 	}
 
 	@Override
 	protected Void doInBackground() throws Exception {
-		Document document = model.getQueryDocument();
-		int length = document.getLength();
-		String text = document.getText(0, length);
-
 		try (OutputStream os = new FileOutputStream(file, false)) {
 			os.write(text.getBytes());
 		}
