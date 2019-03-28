@@ -8,6 +8,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -57,16 +58,40 @@ public final class SaveAsFileAction extends AbstractAction implements Action {
 
 		if (result == JFileChooser.APPROVE_OPTION) {
 			File file = chooser.getSelectedFile();
-			Document document = model.getQueryDocument();
-			int length = document.getLength();
 
-			try {
-				String text = document.getText(0, length);
-				SaveFileWorker worker = new SaveFileWorker(model, file, text);
-				worker.execute();
-			} catch (BadLocationException exception) {
-				Message.showError(exception);
+			if (file.exists()) {
+				result = JOptionPane.showConfirmDialog(
+					frame,
+					"This file exists. Do you want to overwrite it?",
+					"File exists",
+					JOptionPane.YES_NO_OPTION
+				);
+
+				if (result == JOptionPane.YES_OPTION) {
+					saveContent(file);
+				}
+			} else {
+				saveContent(file);
 			}
+		}
+	}
+
+	/**
+	 * Save editor content to file.
+	 *
+	 * @param file
+	 *            file
+	 */
+	private void saveContent(final File file) {
+		Document document = model.getQueryDocument();
+		int length = document.getLength();
+
+		try {
+			String text = document.getText(0, length);
+			SaveFileWorker worker = new SaveFileWorker(model, file, text);
+			worker.execute();
+		} catch (BadLocationException e) {
+			Message.showError(e);
 		}
 	}
 
