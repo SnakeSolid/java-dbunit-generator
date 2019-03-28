@@ -6,7 +6,6 @@ import java.awt.Font;
 import java.awt.event.MouseListener;
 
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -46,8 +45,6 @@ public final class MainFrame extends JFrame {
 
 	private static final int PREFERRED_HEIGHT = 600;
 
-	private static final int BORDER_PADDING = 8;
-
 	private static final int DEFAULT_DIVIDER_LOCATION = 350;
 
 	private final Configuration config;
@@ -68,6 +65,12 @@ public final class MainFrame extends JFrame {
 
 	private Action closeFrameAction;
 
+	private JTextArea queryText;
+
+	private JTextArea datasetText;
+
+	private JSplitPane splitPane;
+
 	/**
 	 * Creates new frame instance with given configuration settings.
 	 *
@@ -84,7 +87,6 @@ public final class MainFrame extends JFrame {
 
 		createActions();
 		createComponents();
-		pack();
 	}
 
 	/**
@@ -111,12 +113,16 @@ public final class MainFrame extends JFrame {
 	private void createComponents() {
 		JMenuBar menuBar = createMenuBar();
 		JToolBar toolBar = createToolBar();
-		JComponent editors = createEditor();
+		JComponent editors = createEditors();
 
 		setJMenuBar(menuBar);
 		add(toolBar, BorderLayout.PAGE_START);
 		add(editors, BorderLayout.CENTER);
 		setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
+
+		pack();
+
+		queryText.requestFocusInWindow();
 	}
 
 	/**
@@ -169,11 +175,11 @@ public final class MainFrame extends JFrame {
 	 *
 	 * @return query editor and result area
 	 */
-	private JComponent createEditor() {
+	private JComponent createEditors() {
 		Font font = getConfigFont();
 		MouseListener popupListener = new TextEditorMouseListener();
 		Document queryDocument = this.model.getQueryDocument();
-		JTextArea queryText = new JTextArea(queryDocument);
+		queryText = new JTextArea(queryDocument);
 		queryText.addMouseListener(popupListener);
 		queryText.setFont(font);
 
@@ -184,7 +190,7 @@ public final class MainFrame extends JFrame {
 		);
 
 		Document datasetDocument = this.model.getDatasetDocument();
-		JTextArea datasetText = new JTextArea(datasetDocument);
+		datasetText = new JTextArea(datasetDocument);
 		datasetText.addMouseListener(popupListener);
 		datasetText.setBackground(UIManager.getColor("control"));
 		datasetText.setFont(font);
@@ -196,11 +202,8 @@ public final class MainFrame extends JFrame {
 			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
 		);
 
-		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryScroll, datasetScroll);
-		splitPane
-			.setBorder(BorderFactory.createEmptyBorder(BORDER_PADDING, BORDER_PADDING, BORDER_PADDING, BORDER_PADDING));
+		splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryScroll, datasetScroll);
 		splitPane.setDividerLocation(DEFAULT_DIVIDER_LOCATION);
-		splitPane.setOneTouchExpandable(true);
 
 		return splitPane;
 	}
