@@ -13,6 +13,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
@@ -21,6 +22,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.undo.UndoManager;
@@ -222,11 +224,6 @@ public final class MainFrame extends JFrame {
 		queryText = new JTextArea(queryDocument);
 		queryText.setFont(font);
 
-		initUndoManager(queryText);
-
-		MouseListener popupListener = new TextEditorMouseListener();
-		queryText.addMouseListener(popupListener);
-
 		JScrollPane queryScroll = new JScrollPane(
 			queryText,
 			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -235,7 +232,6 @@ public final class MainFrame extends JFrame {
 
 		Document datasetDocument = this.model.getDatasetDocument();
 		datasetText = new JTextArea(datasetDocument);
-		datasetText.addMouseListener(popupListener);
 		datasetText.setBackground(UIManager.getColor("control"));
 		datasetText.setFont(font);
 		datasetText.setEditable(false);
@@ -249,7 +245,64 @@ public final class MainFrame extends JFrame {
 		splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryScroll, datasetScroll);
 		splitPane.setDividerLocation(DEFAULT_DIVIDER_LOCATION);
 
+		initUndoManager(queryText);
+		initFullPopupMenu(queryText);
+		initShortPopupMenu(datasetText);
+
 		return splitPane;
+	}
+
+	/**
+	 * Creates and set short context menu (only copy and select all actions) for
+	 * given component.
+	 *
+	 * @param textComponent
+	 *            text component
+	 */
+	private void initShortPopupMenu(final JTextComponent textComponent) {
+		ActionMap actionMap = textComponent.getActionMap();
+		Action copy = actionMap.get(DefaultEditorKit.copyAction);
+		Action selectAll = actionMap.get(DefaultEditorKit.selectAllAction);
+
+		copy.putValue(Action.NAME, "Copy");
+		selectAll.putValue(Action.NAME, "Select all");
+
+		JPopupMenu popupMenu = new JPopupMenu();
+		popupMenu.add(copy);
+		popupMenu.add(selectAll);
+
+		MouseListener popupListener = new TextEditorMouseListener(popupMenu);
+		textComponent.addMouseListener(popupListener);
+	}
+
+	/**
+	 * Creates and set full context menu (cut, copy, paste and select all
+	 * actions) for given component.
+	 *
+	 * @param textComponent
+	 *            text component
+	 */
+	private void initFullPopupMenu(final JTextComponent textComponent) {
+		ActionMap actionMap = textComponent.getActionMap();
+		Action cut = actionMap.get(DefaultEditorKit.cutAction);
+		Action copy = actionMap.get(DefaultEditorKit.copyAction);
+		Action paste = actionMap.get(DefaultEditorKit.pasteAction);
+		Action selectAll = actionMap.get(DefaultEditorKit.selectAllAction);
+
+		cut.putValue(Action.NAME, "Cut");
+		copy.putValue(Action.NAME, "Copy");
+		paste.putValue(Action.NAME, "Paste");
+		selectAll.putValue(Action.NAME, "Select all");
+
+		JPopupMenu popupMenu = new JPopupMenu();
+		popupMenu.add(cut);
+		popupMenu.add(copy);
+		popupMenu.add(paste);
+		popupMenu.addSeparator();
+		popupMenu.add(selectAll);
+
+		MouseListener popupListener = new TextEditorMouseListener(popupMenu);
+		textComponent.addMouseListener(popupListener);
 	}
 
 	/**
