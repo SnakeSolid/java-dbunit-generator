@@ -11,6 +11,7 @@ import javax.swing.text.PlainDocument;
 import javax.swing.text.SimpleAttributeSet;
 
 import ru.snake.dbunit.generator.config.Configuration;
+import ru.snake.dbunit.generator.listener.DocumentModifiedListener;
 
 /**
  * Main frame internal state model. Contains connections settings and text
@@ -59,11 +60,16 @@ public class MainModel {
 
 	/**
 	 * Set modified state for model.
+	 *
+	 * @param document
+	 *            changed document
 	 */
-	private void setModified() {
-		this.modified = true;
+	private void setModified(final Document document) {
+		if (document == queryDocument) {
+			this.modified = true;
 
-		fireEditorStateChanged();
+			fireEditorStateChanged();
+		}
 	}
 
 	/**

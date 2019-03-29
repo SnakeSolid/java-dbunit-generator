@@ -22,6 +22,7 @@ import javax.swing.text.Document;
 
 import ru.snake.dbunit.generator.action.CloseFrameAction;
 import ru.snake.dbunit.generator.action.ExecuteQueryAction;
+import ru.snake.dbunit.generator.action.ExportFileAction;
 import ru.snake.dbunit.generator.action.NewFileAction;
 import ru.snake.dbunit.generator.action.OpenFileAction;
 import ru.snake.dbunit.generator.action.SaveAsFileAction;
@@ -59,6 +60,8 @@ public final class MainFrame extends JFrame {
 
 	private Action saveAsFileAction;
 
+	private Action exportFileAction;
+
 	private Action selectConnectionAction;
 
 	private Action executeQueryAction;
@@ -93,18 +96,45 @@ public final class MainFrame extends JFrame {
 	 * Creates and initialize all actions.
 	 */
 	private void createActions() {
+		JFileChooser queryChooser = createQueryChooser();
+		JFileChooser datasetChooser = createDatasetChooser();
+
+		newFileAction = new NewFileAction(this, model, queryChooser);
+		openFileAction = new OpenFileAction(this, model, queryChooser);
+		saveFileAction = new SaveFileAction(this, model, queryChooser);
+		saveAsFileAction = new SaveAsFileAction(this, model, queryChooser);
+		exportFileAction = new ExportFileAction(this, model, datasetChooser);
+		selectConnectionAction = new SelectConnectionAction(this, this.config);
+		executeQueryAction = new ExecuteQueryAction(this, this.config);
+		closeFrameAction = new CloseFrameAction(this, model, queryChooser);
+	}
+
+	/**
+	 * Creates new {@link JFileChooser} for data set files.
+	 *
+	 * @return file chooser
+	 */
+	private JFileChooser createDatasetChooser() {
+		JFileChooser chooser = new JFileChooser();
+		FileFilter filter = new FileNameExtensionFilter("DBUnit dataset files (*.xml)", "xml");
+		chooser.addChoosableFileFilter(filter);
+		chooser.setFileFilter(filter);
+
+		return chooser;
+	}
+
+	/**
+	 * Creates new {@link JFileChooser} for query files.
+	 *
+	 * @return file chooser
+	 */
+	private JFileChooser createQueryChooser() {
 		JFileChooser chooser = new JFileChooser();
 		FileFilter filter = new FileNameExtensionFilter("Query files (*.sql; *.txt)", "sql", "txt");
 		chooser.addChoosableFileFilter(filter);
 		chooser.setFileFilter(filter);
 
-		newFileAction = new NewFileAction(this, model, chooser);
-		openFileAction = new OpenFileAction(this, model, chooser);
-		saveFileAction = new SaveFileAction(this, model, chooser);
-		saveAsFileAction = new SaveAsFileAction(this, model, chooser);
-		selectConnectionAction = new SelectConnectionAction(this, this.config);
-		executeQueryAction = new ExecuteQueryAction(this, this.config);
-		closeFrameAction = new CloseFrameAction(this, model, chooser);
+		return chooser;
 	}
 
 	/**
@@ -138,6 +168,8 @@ public final class MainFrame extends JFrame {
 		fileMenu.add(saveFileAction);
 		fileMenu.add(saveAsFileAction);
 		fileMenu.addSeparator();
+		fileMenu.add(exportFileAction);
+		fileMenu.addSeparator();
 		fileMenu.add(closeFrameAction);
 
 		JMenu connectionMenu = new JMenu("Connection");
@@ -166,6 +198,8 @@ public final class MainFrame extends JFrame {
 		toolBar.addSeparator();
 		toolBar.add(selectConnectionAction);
 		toolBar.add(executeQueryAction);
+		toolBar.addSeparator();
+		toolBar.add(exportFileAction);
 
 		return toolBar;
 	}

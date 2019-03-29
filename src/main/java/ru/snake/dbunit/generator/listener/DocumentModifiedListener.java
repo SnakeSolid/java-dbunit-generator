@@ -1,7 +1,10 @@
-package ru.snake.dbunit.generator.model;
+package ru.snake.dbunit.generator.listener;
+
+import java.util.function.Consumer;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
 
 /**
  * Wrapper over document modification. To call the same function for all
@@ -12,7 +15,7 @@ import javax.swing.event.DocumentListener;
  */
 public final class DocumentModifiedListener implements DocumentListener {
 
-	private final Runnable callback;
+	private final Consumer<Document> callback;
 
 	/**
 	 * Create new modification listener.
@@ -20,23 +23,23 @@ public final class DocumentModifiedListener implements DocumentListener {
 	 * @param callback
 	 *            callback
 	 */
-	public DocumentModifiedListener(final Runnable callback) {
+	public DocumentModifiedListener(final Consumer<Document> callback) {
 		this.callback = callback;
 	}
 
 	@Override
 	public void insertUpdate(final DocumentEvent e) {
-		callback.run();
+		callback.accept(e.getDocument());
 	}
 
 	@Override
 	public void removeUpdate(final DocumentEvent e) {
-		callback.run();
+		callback.accept(e.getDocument());
 	}
 
 	@Override
 	public void changedUpdate(final DocumentEvent e) {
-		callback.run();
+		callback.accept(e.getDocument());
 	}
 
 }
