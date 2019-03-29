@@ -10,11 +10,11 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import ru.snake.dbunit.generator.FileDialogs;
 import ru.snake.dbunit.generator.Message;
 import ru.snake.dbunit.generator.model.MainModel;
 import ru.snake.dbunit.generator.worker.LoadFileWorker;
@@ -62,45 +62,8 @@ public final class OpenFileAction extends AbstractAction implements Action {
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
-		if (model.isModified()) {
-			int result = JOptionPane.showConfirmDialog(
-				frame,
-				"Query modified. Do you want to save it?",
-				"Content changed",
-				JOptionPane.YES_NO_CANCEL_OPTION
-			);
-
-			if (result == JOptionPane.YES_OPTION) {
-				if (model.hasFile()) {
-					saveAndLoadContent(model.getFile());
-				} else {
-					result = chooser.showSaveDialog(frame);
-
-					if (result == JFileChooser.APPROVE_OPTION) {
-						File file = chooser.getSelectedFile();
-
-						if (file.exists()) {
-							result = JOptionPane.showConfirmDialog(
-								frame,
-								"This file exists. Do you want to overwrite it?",
-								"File exists",
-								JOptionPane.YES_NO_OPTION
-							);
-
-							if (result == JOptionPane.YES_OPTION) {
-								saveAndLoadContent(file);
-							}
-						} else {
-							saveAndLoadContent(file);
-						}
-					}
-				}
-			} else if (result == JOptionPane.NO_OPTION) {
-				loadContent();
-			}
-		} else {
-			loadContent();
-		}
+		FileDialogs fileDialogs = new FileDialogs(frame, model);
+		fileDialogs.showChangeDialog(chooser, this::loadContent, this::saveAndLoadContent);
 	}
 
 	/**

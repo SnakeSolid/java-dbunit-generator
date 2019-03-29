@@ -10,11 +10,11 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import ru.snake.dbunit.generator.FileDialogs;
 import ru.snake.dbunit.generator.Message;
 import ru.snake.dbunit.generator.listener.DocumentModifiedListener;
 import ru.snake.dbunit.generator.model.MainModel;
@@ -79,26 +79,8 @@ public final class ExportFileAction extends AbstractAction implements Action {
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
-		int result = chooser.showSaveDialog(frame);
-
-		if (result == JFileChooser.APPROVE_OPTION) {
-			File file = chooser.getSelectedFile();
-
-			if (file.exists()) {
-				result = JOptionPane.showConfirmDialog(
-					frame,
-					"This file exists. Do you want to overwrite it?",
-					"File exists",
-					JOptionPane.YES_NO_OPTION
-				);
-
-				if (result == JOptionPane.YES_OPTION) {
-					exportContent(file);
-				}
-			} else {
-				exportContent(file);
-			}
-		}
+		FileDialogs fileDialogs = new FileDialogs(frame, model);
+		fileDialogs.showSaveAsDialog(chooser, this::exportContent);
 	}
 
 	/**

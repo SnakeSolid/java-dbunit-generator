@@ -10,11 +10,11 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import ru.snake.dbunit.generator.FileDialogs;
 import ru.snake.dbunit.generator.Message;
 import ru.snake.dbunit.generator.model.EditorStateListener;
 import ru.snake.dbunit.generator.model.MainModel;
@@ -65,30 +65,8 @@ public final class SaveFileAction extends AbstractAction implements Action, Edit
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
-		if (model.hasFile()) {
-			saveContent(model.getFile());
-		} else {
-			int result = chooser.showSaveDialog(frame);
-
-			if (result == JFileChooser.APPROVE_OPTION) {
-				File file = chooser.getSelectedFile();
-
-				if (file.exists()) {
-					result = JOptionPane.showConfirmDialog(
-						frame,
-						"This file exists. Do you want to overwrite it?",
-						"File exists",
-						JOptionPane.YES_NO_OPTION
-					);
-
-					if (result == JOptionPane.YES_OPTION) {
-						saveContent(file);
-					}
-				} else {
-					saveContent(file);
-				}
-			}
-		}
+		FileDialogs fileDialogs = new FileDialogs(frame, model);
+		fileDialogs.showSaveDialog(chooser, this::saveContent);
 	}
 
 	/**
