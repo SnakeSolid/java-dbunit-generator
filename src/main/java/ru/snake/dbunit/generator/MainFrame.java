@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.event.MouseListener;
 
 import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -15,19 +17,24 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
+import javax.swing.undo.UndoManager;
 
 import ru.snake.dbunit.generator.action.CloseFrameAction;
 import ru.snake.dbunit.generator.action.ExecuteQueryAction;
 import ru.snake.dbunit.generator.action.ExportFileAction;
 import ru.snake.dbunit.generator.action.NewFileAction;
 import ru.snake.dbunit.generator.action.OpenFileAction;
+import ru.snake.dbunit.generator.action.RedoAction;
 import ru.snake.dbunit.generator.action.SaveAsFileAction;
 import ru.snake.dbunit.generator.action.SaveFileAction;
 import ru.snake.dbunit.generator.action.SelectConnectionAction;
+import ru.snake.dbunit.generator.action.UndoAction;
 import ru.snake.dbunit.generator.config.Configuration;
 import ru.snake.dbunit.generator.listener.TextEditorMouseListener;
 import ru.snake.dbunit.generator.model.MainModel;
@@ -211,11 +218,14 @@ public final class MainFrame extends JFrame {
 	 */
 	private JComponent createEditors() {
 		Font font = getConfigFont();
-		MouseListener popupListener = new TextEditorMouseListener();
 		Document queryDocument = this.model.getQueryDocument();
 		queryText = new JTextArea(queryDocument);
-		queryText.addMouseListener(popupListener);
 		queryText.setFont(font);
+
+		initUndoManager(queryText);
+
+		MouseListener popupListener = new TextEditorMouseListener();
+		queryText.addMouseListener(popupListener);
 
 		JScrollPane queryScroll = new JScrollPane(
 			queryText,
@@ -240,6 +250,29 @@ public final class MainFrame extends JFrame {
 		splitPane.setDividerLocation(DEFAULT_DIVIDER_LOCATION);
 
 		return splitPane;
+	}
+
+	/**
+	 * Creates undo and redo actions for given text component.
+	 *
+	 * @param textComponent
+	 *            text component
+	 */
+	private void initUndoManager(final JTextComponent textComponent) {
+		UndoManager undoManager = new UndoManager();
+		TextUndoManager textManager = new TextUndoManager(undoManager);
+		Document document = textComponent.getDocument();
+		Action undoAction = new UndoAction(this, document, textManager);
+		Action redoAction = new RedoAction(this, document, textManager);
+		document.addUndoableEditListener(textManager);
+
+		InputMap inputMap = textComponent.getInputMap();
+		inputMap.put(KeyStroke.getKeyStroke("control Z"), "Undo");
+		inputMap.put(KeyStroke.getKeyStroke("control Y"), "Redo");
+
+		ActionMap actionMap = textComponent.getActionMap();
+		actionMap.put("Undo", undoAction);
+		actionMap.put("Redo", redoAction);
 	}
 
 	/**
