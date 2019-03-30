@@ -9,8 +9,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyledDocument;
 
-import ru.snake.dbunit.generator.config.Configuration;
+import ru.snake.dbunit.generator.document.SqlDocument;
 import ru.snake.dbunit.generator.listener.DocumentModifiedListener;
 
 /**
@@ -22,9 +23,7 @@ import ru.snake.dbunit.generator.listener.DocumentModifiedListener;
  */
 public class MainModel {
 
-	private final Configuration config;
-
-	private final Document queryDocument;
+	private final StyledDocument queryDocument;
 
 	private final Document datasetDocument;
 
@@ -40,14 +39,9 @@ public class MainModel {
 
 	/**
 	 * Creates empty model instance with given configuration settings.
-	 *
-	 * @param config
-	 *            configuration settings
 	 */
-	public MainModel(final Configuration config) {
-		this.config = config;
-
-		this.queryDocument = new PlainDocument();
+	public MainModel() {
+		this.queryDocument = new SqlDocument();
 		this.datasetDocument = new PlainDocument();
 		this.connectionListeners = new ArrayList<>();
 		this.editorStateListeners = new ArrayList<>();
@@ -106,7 +100,7 @@ public class MainModel {
 	 *
 	 * @return query document
 	 */
-	public Document getQueryDocument() {
+	public StyledDocument getQueryDocument() {
 		return queryDocument;
 	}
 

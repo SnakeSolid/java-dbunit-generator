@@ -17,6 +17,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -25,6 +26,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.StyledDocument;
 import javax.swing.undo.UndoManager;
 
 import ru.snake.dbunit.generator.action.CloseFrameAction;
@@ -77,9 +79,9 @@ public final class MainFrame extends JFrame {
 
 	private Action closeFrameAction;
 
-	private JTextArea queryText;
+	private JTextComponent queryText;
 
-	private JTextArea datasetText;
+	private JTextComponent datasetText;
 
 	private JSplitPane splitPane;
 
@@ -220,8 +222,8 @@ public final class MainFrame extends JFrame {
 	 */
 	private JComponent createEditors() {
 		Font font = getConfigFont();
-		Document queryDocument = this.model.getQueryDocument();
-		queryText = new JTextArea(queryDocument);
+		StyledDocument queryDocument = this.model.getQueryDocument();
+		queryText = new JTextPane(queryDocument);
 		queryText.setFont(font);
 
 		JScrollPane queryScroll = new JScrollPane(

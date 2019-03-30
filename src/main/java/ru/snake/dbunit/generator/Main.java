@@ -75,7 +75,7 @@ public final class Main {
 	 *            configuration
 	 */
 	private void showMainFrame(final Configuration config) {
-		MainModel model = new MainModel(config);
+		MainModel model = new MainModel();
 		MainFrame mainFrame = new MainFrame(config, model);
 		mainFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		mainFrame.setVisible(true);

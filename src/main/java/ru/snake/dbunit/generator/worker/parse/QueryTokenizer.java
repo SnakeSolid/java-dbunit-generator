@@ -12,9 +12,9 @@ public final class QueryTokenizer {
 
 	private final List<Token> tokens;
 
-	private TokenizerState state;
+	private final StringBuilder currentToken;
 
-	private StringBuilder currentToken;
+	private TokenizerState state;
 
 	private int position;
 
@@ -230,6 +230,11 @@ public final class QueryTokenizer {
 		return position >= text.length;
 	}
 
+	/**
+	 * Returns current char or zero.
+	 *
+	 * @return current char
+	 */
 	private char getCurrentChar() {
 		if (position < text.length) {
 			return text[position];
@@ -238,6 +243,11 @@ public final class QueryTokenizer {
 		return ZERO;
 	}
 
+	/**
+	 * Returns next char or zero.
+	 *
+	 * @return next char
+	 */
 	private char getNextChar() {
 		if (position + 1 < text.length) {
 			return text[position + 1];
