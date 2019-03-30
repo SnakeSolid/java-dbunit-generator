@@ -57,6 +57,8 @@ public final class MainFrame extends JFrame {
 
 	private static final int PREFERRED_HEIGHT = 600;
 
+	private static final float CARET_ASPECT_RATIO = 0.1f;
+
 	private static final int DEFAULT_DIVIDER_LOCATION = 350;
 
 	private final Configuration config;
@@ -224,6 +226,7 @@ public final class MainFrame extends JFrame {
 		Font font = getConfigFont();
 		StyledDocument queryDocument = this.model.getQueryDocument();
 		queryText = new JTextPane(queryDocument);
+		queryText.putClientProperty("caretAspectRatio", CARET_ASPECT_RATIO);
 		queryText.setFont(font);
 
 		JScrollPane queryScroll = new JScrollPane(
