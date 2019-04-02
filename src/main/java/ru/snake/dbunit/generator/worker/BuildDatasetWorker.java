@@ -27,6 +27,7 @@ import ru.snake.dbunit.generator.config.TypeMapping;
 import ru.snake.dbunit.generator.model.ConnectionSettings;
 import ru.snake.dbunit.generator.worker.mapper.AsciiStringMapper;
 import ru.snake.dbunit.generator.worker.mapper.Base64BytesMapper;
+import ru.snake.dbunit.generator.worker.mapper.Base64PrefixBytesMapper;
 import ru.snake.dbunit.generator.worker.mapper.ColumnMapper;
 import ru.snake.dbunit.generator.worker.mapper.DummyStringMapper;
 import ru.snake.dbunit.generator.worker.mapper.HexBytesMapper;
@@ -350,6 +351,9 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 
 		case BASE64:
 			return new Base64BytesMapper(columnName);
+
+		case BASE64_WITH_PREFIX:
+			return new Base64PrefixBytesMapper(columnName);
 
 		default:
 			throw new IllegalArgumentException("Data mapper " + dataMapper + " has no corresponding class.");

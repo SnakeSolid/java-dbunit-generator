@@ -77,7 +77,7 @@ drivers:
 
     # Type mapping. By default all types will be shown as raw strings.
     # If some type requires some conversion, it can be defined in mappings.
-    # Allowed following conversions: ASCII, UTF8, HEX, BASE64
+    # Allowed following conversions: ASCII, UTF8, HEX, BASE64, BASE64_WITH_PREFIX
     typeMappings:
       "bytea": BASE64
 

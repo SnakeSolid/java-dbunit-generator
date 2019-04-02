@@ -24,8 +24,13 @@ public enum TypeMapping {
 	HEX,
 
 	/**
-	 * Value will be encoded as BASE64 string with '[BASE64]' prefix.
+	 * Value will be encoded as BASE64 string without prefix.
 	 */
 	BASE64,
+
+	/**
+	 * Value will be encoded as BASE64 string with '[BASE64]' prefix.
+	 */
+	BASE64_WITH_PREFIX,
 
 }
