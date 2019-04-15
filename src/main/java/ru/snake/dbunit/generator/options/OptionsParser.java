@@ -1,8 +1,12 @@
 package ru.snake.dbunit.generator.options;
 
 import java.io.File;
+import java.net.URL;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -10,6 +14,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import ru.snake.dbunit.generator.Main;
 
 /**
  * Parse command line arguments and environment variables to determine options.
@@ -87,10 +93,31 @@ public final class OptionsParser {
 			throw new CliOptionsParseException(e);
 		}
 
-		String config = getDefaultOption(commandLine, SOPT_CONFIG, ENV_CONFIG, DEFAULT_CONFIG);
+		String defaultConfig = getDefaultConfigFile();
+		String config = getDefaultOption(commandLine, SOPT_CONFIG, ENV_CONFIG, defaultConfig);
 		File configFile = new File(config);
 
 		return new CliOptions.Builder().setConfigFile(configFile).build();
+	}
+
+	/**
+	 * Calculates configuration file path from executable JAR file location.
+	 * Default configuration should be in the same directory as jar file.
+	 *
+	 * @return default configuration file path
+	 */
+	private String getDefaultConfigFile() {
+		return Optional.ofNullable(Main.class.getProtectionDomain())
+			.map(ProtectionDomain::getCodeSource)
+			.map(CodeSource::getLocation)
+			.map(URL::getPath)
+			.map(path -> {
+				File jarDirectory = new File(path).getParentFile();
+				File configFile = new File(jarDirectory, DEFAULT_CONFIG);
+
+				return configFile.getAbsolutePath();
+			})
+			.orElse(DEFAULT_CONFIG);
 	}
 
 	/**
