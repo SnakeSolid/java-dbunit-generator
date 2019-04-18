@@ -23,6 +23,7 @@ public class SqlTokenizer {
 		KEYWORDS.add("with");
 		KEYWORDS.add("as");
 		KEYWORDS.add("select");
+		KEYWORDS.add("distinct");
 		KEYWORDS.add("values");
 		KEYWORDS.add("from");
 		KEYWORDS.add("inner");
@@ -37,6 +38,9 @@ public class SqlTokenizer {
 		KEYWORDS.add("having");
 		KEYWORDS.add("group");
 		KEYWORDS.add("order");
+		KEYWORDS.add("union");
+		KEYWORDS.add("all");
+		KEYWORDS.add("except");
 		KEYWORDS.add("limit");
 		KEYWORDS.add("for");
 		KEYWORDS.add("in");
@@ -63,7 +67,7 @@ public class SqlTokenizer {
 	 * @param text
 	 *            text
 	 */
-	public SqlTokenizer(final char[] text) {
+	private SqlTokenizer(final char[] text) {
 		this.text = text;
 
 		this.tokens = new ArrayList<Token>();
@@ -217,6 +221,10 @@ public class SqlTokenizer {
 		currentToken.setLength(0);
 	}
 
+	/**
+	 * Process next token in {@link TokenizerState#CODE} state. Change state and
+	 * push next token if it's necessarily.
+	 */
 	private void visitCode() {
 		if (getCurrentChar() == '-' && getNextChar() == '-') {
 			pushOther();
@@ -245,6 +253,10 @@ public class SqlTokenizer {
 		currentToken.setLength(0);
 	}
 
+	/**
+	 * Process next token in {@link TokenizerState#IDENTIFIER} state. Change
+	 * state and push next token if it's necessarily.
+	 */
 	private void visitIdenhtifier() {
 		if (getCurrentChar() == '-' && getNextChar() == '-') {
 			pushIdentifier();
