@@ -1,4 +1,4 @@
-package ru.snake.dbunit.generator.worker;
+package ru.snake.dbunit.generator.worker.dataset;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,15 +37,16 @@ public final class DatasetBuilder {
 	}
 
 	/**
-	 * Add next row to table. Rows within same table are unique.
+	 * Add next table row to builder. All rows within same table are unique.
 	 *
-	 * @param tableName
-	 *            table name
 	 * @param tableRow
 	 *            table row
 	 */
-	public void pushRow(final String tableName, final String tableRow) {
-		tableRows.computeIfAbsent(tableName, e -> new LinkedHashSet<>()).add(tableRow);
+	public void pushRow(final TableRow tableRow) {
+		String tableName = tableRow.getTableName();
+		String xmlString = tableRow.toXmlString();
+
+		tableRows.computeIfAbsent(tableName, e -> new LinkedHashSet<>()).add(xmlString);
 	}
 
 	/**

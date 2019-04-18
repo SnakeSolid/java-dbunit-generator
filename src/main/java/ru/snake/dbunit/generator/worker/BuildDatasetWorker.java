@@ -25,6 +25,9 @@ import ru.snake.dbunit.generator.config.Configuration;
 import ru.snake.dbunit.generator.config.TableNameCase;
 import ru.snake.dbunit.generator.config.TypeMapping;
 import ru.snake.dbunit.generator.model.ConnectionSettings;
+import ru.snake.dbunit.generator.worker.dataset.DatasetBuilder;
+import ru.snake.dbunit.generator.worker.dataset.TableRow;
+import ru.snake.dbunit.generator.worker.dataset.TableRowBuilder;
 import ru.snake.dbunit.generator.worker.mapper.AsciiStringMapper;
 import ru.snake.dbunit.generator.worker.mapper.Base64BytesMapper;
 import ru.snake.dbunit.generator.worker.mapper.Base64PrefixBytesMapper;
@@ -207,9 +210,11 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 			List<ColumnMapper> mappers = getMappers(resultSet);
 
 			while (resultSet.next()) {
-				String tableRow = getTableRow(resultSet, tableName, mappers);
+				TableRow tableRow = getTableRow(resultSet, tableName, mappers);
 
-				datasetBuilder.pushRow(tableName, tableRow);
+				if (!tableRow.isEmpty()) {
+					datasetBuilder.pushRow(tableRow);
+				}
 			}
 		}
 	}
@@ -251,11 +256,11 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	 *            table name
 	 * @param mappers
 	 *            column mappers
-	 * @return table row string
+	 * @return table row
 	 * @throws SQLException
 	 *             if error occurred
 	 */
-	private String getTableRow(final ResultSet resultSet, final String tableName, final List<ColumnMapper> mappers)
+	private TableRow getTableRow(final ResultSet resultSet, final String tableName, final List<ColumnMapper> mappers)
 			throws SQLException {
 		TableRowBuilder builder = new TableRowBuilder(tableName);
 

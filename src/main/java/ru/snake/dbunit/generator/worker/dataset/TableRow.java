@@ -1,15 +1,14 @@
-package ru.snake.dbunit.generator.worker;
+package ru.snake.dbunit.generator.worker.dataset;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Builder for single data set row.
+ * Class represents single table row including all column names and values.
  *
  * @author snake
  *
  */
-public final class TableRowBuilder {
+public final class TableRow {
 
 	private final String tableName;
 
@@ -18,36 +17,46 @@ public final class TableRowBuilder {
 	private final List<String> values;
 
 	/**
-	 * Create new row builder for given table name.
+	 * Creates new instance using given table name and column values.
 	 *
 	 * @param tableName
 	 *            table name
+	 * @param columnNames
+	 *            column names
+	 * @param values
+	 *            values
 	 */
-	public TableRowBuilder(final String tableName) {
+	public TableRow(final String tableName, final List<String> columnNames, final List<String> values) {
 		this.tableName = tableName;
-		this.columnNames = new ArrayList<>();
-		this.values = new ArrayList<>();
+		this.columnNames = columnNames;
+		this.values = values;
 	}
 
 	/**
-	 * Push next column to builder.
+	 * Returns table name related with this row.
 	 *
-	 * @param columnName
-	 *            column name
-	 * @param value
-	 *            value
+	 * @return table name
 	 */
-	public void push(final String columnName, final String value) {
-		columnNames.add(columnName);
-		values.add(value);
+	public String getTableName() {
+		return tableName;
 	}
 
 	/**
-	 * Build XML row from table and available columns.
+	 * Returns {@code true} if row has no values, otherwise {@code false}.
 	 *
-	 * @return XML row
+	 * @return true if row has no values
 	 */
-	public String build() {
+	public boolean isEmpty() {
+		return columnNames.isEmpty() && values.isEmpty();
+	}
+
+	/**
+	 * Creates string representing XML element value. Element name will be same
+	 * as table name, column names will be attributes.
+	 *
+	 * @return XML element as string
+	 */
+	public String toXmlString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("<");
 		builder.append(tableName);
@@ -85,7 +94,7 @@ public final class TableRowBuilder {
 
 	@Override
 	public String toString() {
-		return "TableRowBuilder [tableName=" + tableName + ", columnNames=" + columnNames + ", values=" + values + "]";
+		return "TableRow [tableName=" + tableName + ", columnNames=" + columnNames + ", values=" + values + "]";
 	}
 
 }
