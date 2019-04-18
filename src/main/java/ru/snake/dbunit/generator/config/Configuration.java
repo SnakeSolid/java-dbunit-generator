@@ -13,6 +13,8 @@ public final class Configuration {
 
 	private FontConfig font;
 
+	private NoTableMode noTableMode;
+
 	private String templateTableName;
 
 	private String skipTablePrefix;
@@ -26,6 +28,7 @@ public final class Configuration {
 	 */
 	public Configuration() {
 		this.font = new FontConfig();
+		this.noTableMode = NoTableMode.ERROR;
 		this.templateTableName = null;
 		this.skipTablePrefix = null;
 		this.tableNameCase = null;
@@ -39,6 +42,15 @@ public final class Configuration {
 	 */
 	public FontConfig getFont() {
 		return font;
+	}
+
+	/**
+	 * Returns mode to use when query has no table name.
+	 *
+	 * @return no table mode
+	 */
+	public NoTableMode getNoTableMode() {
+		return noTableMode;
 	}
 
 	/**
@@ -79,8 +91,9 @@ public final class Configuration {
 
 	@Override
 	public String toString() {
-		return "Configuration [font=" + font + ", templateTableName=" + templateTableName + ", skipTablePrefix="
-				+ skipTablePrefix + ", tableNameCase=" + tableNameCase + ", drivers=" + drivers + "]";
+		return "Configuration [font=" + font + ", noTableMode=" + noTableMode + ", templateTableName="
+				+ templateTableName + ", skipTablePrefix=" + skipTablePrefix + ", tableNameCase=" + tableNameCase
+				+ ", drivers=" + drivers + "]";
 	}
 
 }

@@ -22,6 +22,7 @@ import javax.swing.text.SimpleAttributeSet;
 
 import ru.snake.dbunit.generator.Message;
 import ru.snake.dbunit.generator.config.Configuration;
+import ru.snake.dbunit.generator.config.NoTableMode;
 import ru.snake.dbunit.generator.config.TableNameCase;
 import ru.snake.dbunit.generator.config.TypeMapping;
 import ru.snake.dbunit.generator.model.ConnectionSettings;
@@ -91,15 +92,7 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 		}
 
 		for (Query query : allQueries) {
-			if (query.getTableName() == null) {
-				StringBuilder builder = new StringBuilder();
-				builder.append("Table for query not defined. ");
-				builder.append("Use single line comment (`-- schema.table`) to define table name. ");
-				builder.append("Query:\n");
-				builder.append(query.getQueryText());
-
-				return Result.error(builder.toString());
-			} else if (isSkippedQuery(query)) {
+			if (isSkippedQuery(query)) {
 				continue;
 			} else if (isTemplateQuery(query)) {
 				Result<List<Query>, String> generatedResult = QueryTemplate.generate(query);
@@ -109,6 +102,14 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 				}
 
 				queries.addAll(generatedResult.getValue());
+			} else if (isInvalidQuery(query)) {
+				StringBuilder builder = new StringBuilder();
+				builder.append("Table for query not defined. ");
+				builder.append("Use single line comment (`-- schema.table`) to define table name. ");
+				builder.append("Query:\n");
+				builder.append(query.getQueryText());
+
+				return Result.error(builder.toString());
 			} else {
 				queries.add(query);
 			}
@@ -157,8 +158,29 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	 *            query
 	 * @return true if name is dummy
 	 */
+	private boolean isInvalidQuery(final Query query) {
+		String tableName = query.getTableName();
+
+		return tableName == null;
+	}
+
+	/**
+	 * Returns true if this query table name starts with the same as skip table
+	 * name in configuration.
+	 *
+	 * @param query
+	 *            query
+	 * @return true if name is dummy
+	 */
 	private boolean isTemplateQuery(final Query query) {
-		String tableName = getQueryTableName(query);
+		String tableName = query.getTableName();
+
+		if (tableName == null) {
+			NoTableMode noTableMode = config.getNoTableMode();
+
+			return noTableMode == NoTableMode.TEMPLATE;
+		}
+
 		String templateName = config.getTemplateTableName();
 
 		if (templateName == null) {
@@ -177,10 +199,10 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	 * @return true if name is dummy
 	 */
 	private boolean isSkippedQuery(final Query query) {
-		String tableName = getQueryTableName(query);
+		String tableName = query.getTableName();
 		String dummyName = config.getSkipTablePrefix();
 
-		if (dummyName == null) {
+		if (tableName == null || dummyName == null) {
 			return false;
 		}
 
