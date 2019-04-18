@@ -50,6 +50,11 @@ font: # font settings for query and result editors
   style: BOLD # Font style: PLAIN, BOLD, ITALIC or BOLD_ITALIC
   size: 14 # Font size in pixels
 
+# Behavior if query has no comment with table name. Possible values: TEMPLATE or ERROR (default).
+# * ERROR - queries with out table name are not allowed.
+# * TEMPLATE - queries without table name used as templates.
+noTableMode: ERROR
+
 # If defined this table name will be used to use query as template.
 templateTableName: "*"
 
