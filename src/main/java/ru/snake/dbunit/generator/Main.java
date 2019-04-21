@@ -1,6 +1,7 @@
 package ru.snake.dbunit.generator;
 
 import java.util.Map;
+import java.util.Properties;
 
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
@@ -50,8 +51,9 @@ public final class Main {
 
 			try {
 				Configuration config = ConfigurationReader.read(options.getConfigFile());
+				String title = buildTitle();
 
-				SwingUtilities.invokeLater(() -> showMainFrame(config));
+				SwingUtilities.invokeLater(() -> showMainFrame(title, config));
 			} catch (ConfigNotFoundException | ReadConfigException e) {
 				Message.showError(e);
 
@@ -69,14 +71,34 @@ public final class Main {
 	}
 
 	/**
+	 * Build application title string from system properties. If properties not
+	 * available returns default title.
+	 *
+	 * @return application title string
+	 */
+	private String buildTitle() {
+		Properties properties = ApplicationProperties.readApplicationProperties();
+		String name = properties.getProperty(ApplicationProperties.PROPEPTY_NAME, "DBUnit dataset generator");
+		String version = properties.getProperty(ApplicationProperties.PROPEPTY_VERSION);
+
+		if (version == null) {
+			return name;
+		} else {
+			return name + " (v" + version + ")";
+		}
+	}
+
+	/**
 	 * Create and show main frame.
 	 *
+	 * @param title
+	 *            application title
 	 * @param config
 	 *            configuration
 	 */
-	private void showMainFrame(final Configuration config) {
+	private void showMainFrame(final String title, final Configuration config) {
 		MainModel model = new MainModel();
-		MainFrame mainFrame = new MainFrame(config, model);
+		MainFrame mainFrame = new MainFrame(title, config, model);
 		mainFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		mainFrame.setVisible(true);
 	}

@@ -90,13 +90,15 @@ public final class MainFrame extends JFrame {
 	/**
 	 * Creates new frame instance with given configuration settings.
 	 *
+	 * @param title
+	 *            frame title
 	 * @param config
 	 *            configuration settings
 	 * @param model
 	 *            internal state model
 	 */
-	public MainFrame(final Configuration config, final MainModel model) {
-		super("DBUnit dataset generator");
+	public MainFrame(final String title, final Configuration config, final MainModel model) {
+		super(title);
 
 		this.config = config;
 		this.model = model;
