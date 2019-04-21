@@ -22,7 +22,6 @@ import javax.swing.text.SimpleAttributeSet;
 
 import ru.snake.dbunit.generator.Message;
 import ru.snake.dbunit.generator.config.Configuration;
-import ru.snake.dbunit.generator.config.NoTableMode;
 import ru.snake.dbunit.generator.config.TableNameCase;
 import ru.snake.dbunit.generator.config.TypeMapping;
 import ru.snake.dbunit.generator.model.ConnectionSettings;
@@ -38,7 +37,6 @@ import ru.snake.dbunit.generator.worker.mapper.HexBytesMapper;
 import ru.snake.dbunit.generator.worker.mapper.Utf8StringMapper;
 import ru.snake.dbunit.generator.worker.parse.QueryParser;
 import ru.snake.dbunit.generator.worker.query.Query;
-import ru.snake.dbunit.generator.worker.query.QueryTemplate;
 
 /**
  * Background worker. Worker read queries from text, executes every query using
@@ -85,38 +83,26 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	@Override
 	protected Result<String, String> doInBackground() throws Exception {
 		List<Query> allQueries = QueryParser.parse(this.queryText);
-		List<Query> queries = new ArrayList<>();
 
 		if (allQueries.isEmpty()) {
 			return Result.error("Dataset must have at least one query.");
 		}
 
-		for (Query query : allQueries) {
-			if (isSkippedQuery(query)) {
-				continue;
-			} else if (isTemplateQuery(query)) {
-				Result<List<Query>, String> generatedResult = QueryTemplate.generate(query);
+		QueryFilter queryFilter = new QueryFilter(
+			config.getNoTableMode(),
+			config.getTemplateTableName(),
+			config.getSkipTablePrefix()
+		);
+		Result<List<Query>, String> filterResult = queryFilter.filter(allQueries);
 
-				if (generatedResult.isError()) {
-					return Result.error(generatedResult.getError());
-				}
-
-				queries.addAll(generatedResult.getValue());
-			} else if (isInvalidQuery(query)) {
-				StringBuilder builder = new StringBuilder();
-				builder.append("Table for query not defined. ");
-				builder.append("Use single line comment (`-- schema.table`) to define table name. ");
-				builder.append("Query:\n");
-				builder.append(query.getQueryText());
-
-				return Result.error(builder.toString());
-			} else {
-				queries.add(query);
-			}
+		if (filterResult.isError()) {
+			return Result.error(filterResult.getError());
 		}
 
+		List<Query> queries = filterResult.getValue();
+
 		if (queries.isEmpty()) {
-			return Result.error("Dataset must have at least one executable 	query.");
+			return Result.error("Dataset must have at least one executable query.");
 		}
 
 		String driverClassName = connectionSettings.getDriverClass();
@@ -138,75 +124,12 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 			try (Connection connection = DriverManager.getConnection(connectionUrl);
 					Statement statement = connection.createStatement()) {
 				for (Query query : queries) {
-					if (isSkippedQuery(query)) {
-						continue;
-					}
-
 					fillQueryDataset(datasetBuilder, statement, query);
 				}
 			}
 
 			return Result.ok(datasetBuilder.build());
 		}
-	}
-
-	/**
-	 * Returns true if this query table name starts with the same as skip table
-	 * name in configuration.
-	 *
-	 * @param query
-	 *            query
-	 * @return true if name is dummy
-	 */
-	private boolean isInvalidQuery(final Query query) {
-		String tableName = query.getTableName();
-
-		return tableName == null;
-	}
-
-	/**
-	 * Returns true if this query table name starts with the same as skip table
-	 * name in configuration.
-	 *
-	 * @param query
-	 *            query
-	 * @return true if name is dummy
-	 */
-	private boolean isTemplateQuery(final Query query) {
-		String tableName = query.getTableName();
-
-		if (tableName == null) {
-			NoTableMode noTableMode = config.getNoTableMode();
-
-			return noTableMode == NoTableMode.TEMPLATE;
-		}
-
-		String templateName = config.getTemplateTableName();
-
-		if (templateName == null) {
-			return false;
-		}
-
-		return tableName.equals(templateName);
-	}
-
-	/**
-	 * Returns true if this query table name starts with the same as skip table
-	 * name in configuration.
-	 *
-	 * @param query
-	 *            query
-	 * @return true if name is dummy
-	 */
-	private boolean isSkippedQuery(final Query query) {
-		String tableName = query.getTableName();
-		String dummyName = config.getSkipTablePrefix();
-
-		if (tableName == null || dummyName == null) {
-			return false;
-		}
-
-		return tableName.startsWith(dummyName);
 	}
 
 	/**
