@@ -73,6 +73,8 @@ public final class ConnectionDialog extends JDialog {
 		JComboBox<String> connectionList = new JComboBox<>(driverListModel);
 		JLabel parametersLabel = new JLabel("Parameters:");
 		JTable parametersTable = new JTable(parametersModel);
+		parametersTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+
 		JScrollPane parameterScroll = new JScrollPane(parametersTable);
 		PrepareConnectionAction connectionAction = new PrepareConnectionAction(
 			this,
