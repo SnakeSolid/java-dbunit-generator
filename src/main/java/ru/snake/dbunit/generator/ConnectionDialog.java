@@ -1,5 +1,7 @@
 package ru.snake.dbunit.generator;
 
+import java.awt.Dimension;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -29,6 +31,10 @@ public final class ConnectionDialog extends JDialog {
 
 	private static final long serialVersionUID = -5094451147263755246L;
 
+	private static final int PREFERRED_HEIGHT = 400;
+
+	private static final int PREFERRED_WIDTH = 640;
+
 	private final Configuration config;
 
 	private ConnectionSettings selectedConnection;
@@ -46,6 +52,8 @@ public final class ConnectionDialog extends JDialog {
 
 		this.config = config;
 		this.selectedConnection = null;
+
+		setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 
 		createComponents();
 		pack();
