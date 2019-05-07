@@ -1,6 +1,7 @@
 package ru.snake.dbunit.generator.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,14 +17,22 @@ import javax.swing.table.TableModel;
  */
 public final class ConnectionParametersTableModel extends AbstractTableModel implements TableModel {
 
+	/**
+	 * Map driver name to map with parameter values.
+	 */
+	private final Map<String, Map<String, String>> savedParameterValues;
+
 	private final List<String> parameterNames;
 
 	private final List<String> parameterValues;
+
+	private String currentDriver;
 
 	/**
 	 * Creates new empty parameters model using configuration.
 	 */
 	public ConnectionParametersTableModel() {
+		this.savedParameterValues = new HashMap<String, Map<String, String>>();
 		this.parameterNames = new ArrayList<String>();
 		this.parameterValues = new ArrayList<String>();
 	}
@@ -73,25 +82,40 @@ public final class ConnectionParametersTableModel extends AbstractTableModel imp
 	@Override
 	public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex) {
 		if (columnIndex == 1) {
-			this.parameterValues.set(rowIndex, String.valueOf(aValue));
+			String name = this.parameterNames.get(rowIndex);
+			String value = String.valueOf(aValue);
+
+			this.parameterValues.set(rowIndex, value);
+
+			if (currentDriver != null) {
+				this.savedParameterValues.computeIfAbsent(currentDriver, k -> new HashMap<>()).put(name, value);
+			}
 		}
 	}
 
 	/**
-	 * Set new parameter list.
+	 * Set new parameter list and fill old available parameter values.
 	 *
+	 * @param driverName
+	 *            current driver name
 	 * @param parameters
 	 *            parameters
 	 */
-	public void setParameters(final List<String> parameters) {
+	public void setParameters(final String driverName, final List<String> parameters) {
 		int oldSize = this.parameterNames.size();
 
+		this.currentDriver = driverName;
 		this.parameterNames.clear();
 		this.parameterNames.addAll(parameters);
 		this.parameterValues.clear();
 
+		Map<String, String> driverParameters = this.savedParameterValues
+			.getOrDefault(driverName, Collections.emptyMap());
+
 		for (String name : parameters) {
-			this.parameterValues.add("");
+			String value = driverParameters.getOrDefault(name, "");
+
+			this.parameterValues.add(value);
 		}
 
 		int newSize = this.parameterNames.size();
@@ -130,8 +154,8 @@ public final class ConnectionParametersTableModel extends AbstractTableModel imp
 
 	@Override
 	public String toString() {
-		return "ConnectionParametersTableModel [parameterNames=" + parameterNames + ", parameterValues="
-				+ parameterValues + "]";
+		return "ConnectionParametersTableModel [savedParameterValues=" + savedParameterValues + ", parameterNames="
+				+ parameterNames + ", parameterValues=" + parameterValues + ", currentDriver=" + currentDriver + "]";
 	}
 
 }

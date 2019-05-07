@@ -63,9 +63,9 @@ public final class ChangeParametersTableListener implements ListDataListener {
 		DriverConfig driverConfig = this.config.getDrivers().get(selectedDriver);
 
 		if (driverConfig != null) {
-			this.parametersModel.setParameters(driverConfig.getParameters());
+			this.parametersModel.setParameters(selectedDriver, driverConfig.getParameters());
 		} else {
-			this.parametersModel.setParameters(Collections.emptyList());
+			this.parametersModel.setParameters(selectedDriver, Collections.emptyList());
 		}
 	}
 

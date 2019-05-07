@@ -12,6 +12,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
 import ru.snake.dbunit.generator.action.CloseDialogAction;
 import ru.snake.dbunit.generator.action.PrepareConnectionAction;
@@ -34,6 +38,8 @@ public final class ConnectionDialog extends JDialog {
 	private static final int PREFERRED_HEIGHT = 400;
 
 	private static final int PREFERRED_WIDTH = 640;
+
+	private static final int COLUMN_NAME_WIDTH = 200;
 
 	private final Configuration config;
 
@@ -69,6 +75,7 @@ public final class ConnectionDialog extends JDialog {
 
 		DriverListModel driverListModel = new DriverListModel(this.config);
 		ConnectionParametersTableModel parametersModel = new ConnectionParametersTableModel();
+		TableColumnModel columnModel = createColumnModel(parametersModel);
 		ChangeParametersTableListener parametersListener = new ChangeParametersTableListener(
 			this.config,
 			driverListModel,
@@ -80,7 +87,7 @@ public final class ConnectionDialog extends JDialog {
 		JLabel connectionLabel = new JLabel("Driver:");
 		JComboBox<String> connectionList = new JComboBox<>(driverListModel);
 		JLabel parametersLabel = new JLabel("Parameters:");
-		JTable parametersTable = new JTable(parametersModel);
+		JTable parametersTable = new JTable(parametersModel, columnModel);
 		parametersTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 
 		JScrollPane parameterScroll = new JScrollPane(parametersTable);
@@ -122,6 +129,31 @@ public final class ConnectionDialog extends JDialog {
 		layout.linkSize(SwingConstants.HORIZONTAL, saveButton, cancelButton);
 
 		setLayout(layout);
+	}
+
+	/**
+	 * Creates new column model for driver property table. Column name will be
+	 * created from given table model.
+	 *
+	 * @param model
+	 *            model to get column name from
+	 * @return table column model
+	 */
+	private TableColumnModel createColumnModel(final TableModel model) {
+		TableColumn nameColumn = new TableColumn(0);
+		nameColumn.setHeaderValue(model.getColumnName(0));
+		nameColumn.setMinWidth(COLUMN_NAME_WIDTH);
+		nameColumn.setMaxWidth(COLUMN_NAME_WIDTH);
+		nameColumn.setPreferredWidth(COLUMN_NAME_WIDTH);
+
+		TableColumn valueColumn = new TableColumn(1);
+		valueColumn.setHeaderValue(model.getColumnName(1));
+
+		TableColumnModel columnModel = new DefaultTableColumnModel();
+		columnModel.addColumn(nameColumn);
+		columnModel.addColumn(valueColumn);
+
+		return columnModel;
 	}
 
 	/**
