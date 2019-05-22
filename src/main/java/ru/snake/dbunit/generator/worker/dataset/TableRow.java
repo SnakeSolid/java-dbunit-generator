@@ -65,31 +65,13 @@ public final class TableRow {
 			builder.append(' ');
 			builder.append(columnNames.get(index));
 			builder.append("=\"");
-			builder.append(escapeControlCharacters(values.get(index)));
+			builder.append(values.get(index));
 			builder.append('"');
 		}
 
 		builder.append(" />");
 
 		return builder.toString();
-	}
-
-	/**
-	 * Escapes XML control characters from string.
-	 *
-	 * @param value
-	 *            value
-	 * @return XML safe value
-	 */
-	private Object escapeControlCharacters(final String value) {
-		String result = value;
-		result = result.replace("\"", "&quot;");
-		result = result.replace("&", "&amp;");
-		result = result.replace("'", "&apos;");
-		result = result.replace("<", "&lt;");
-		result = result.replace(">", "&gt;");
-
-		return result;
 	}
 
 	@Override

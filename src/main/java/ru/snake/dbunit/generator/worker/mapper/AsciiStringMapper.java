@@ -55,6 +55,16 @@ public final class AsciiStringMapper implements ColumnMapper {
 				builder.append(Character.forDigit((ch >> 4) & 0x0f, 16));
 				builder.append(Character.forDigit((ch >> 0) & 0x0f, 16));
 				builder.append(";");
+			} else if (ch == '"') {
+				builder.append("&quot;");
+			} else if (ch == '&') {
+				builder.append("&amp;");
+			} else if (ch == '\'') {
+				builder.append("&apos;");
+			} else if (ch == '<') {
+				builder.append("&lt;");
+			} else if (ch == '>') {
+				builder.append("&gt;");
 			} else {
 				builder.append((char) ch);
 			}
