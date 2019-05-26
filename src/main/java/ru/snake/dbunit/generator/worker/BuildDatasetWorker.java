@@ -6,10 +6,8 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -23,19 +21,12 @@ import javax.swing.text.SimpleAttributeSet;
 import ru.snake.dbunit.generator.Message;
 import ru.snake.dbunit.generator.config.Configuration;
 import ru.snake.dbunit.generator.config.TableNameCase;
-import ru.snake.dbunit.generator.config.TypeMapping;
 import ru.snake.dbunit.generator.model.ConnectionSettings;
 import ru.snake.dbunit.generator.worker.dataset.DatasetBuilder;
 import ru.snake.dbunit.generator.worker.dataset.TableRow;
 import ru.snake.dbunit.generator.worker.dataset.TableRowBuilder;
-import ru.snake.dbunit.generator.worker.mapper.AsciiStringMapper;
-import ru.snake.dbunit.generator.worker.mapper.Base64BytesMapper;
-import ru.snake.dbunit.generator.worker.mapper.Base64PrefixBytesMapper;
 import ru.snake.dbunit.generator.worker.mapper.ColumnMapper;
-import ru.snake.dbunit.generator.worker.mapper.DummyStringMapper;
-import ru.snake.dbunit.generator.worker.mapper.HexBytesMapper;
-import ru.snake.dbunit.generator.worker.mapper.Utf8StringMapper;
-import ru.snake.dbunit.generator.worker.mapper.XmlEscape;
+import ru.snake.dbunit.generator.worker.mapper.MapperBuilder;
 import ru.snake.dbunit.generator.worker.parse.QueryParser;
 import ru.snake.dbunit.generator.worker.query.Query;
 
@@ -147,13 +138,14 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	 */
 	private void fillQueryDataset(final DatasetBuilder datasetBuilder, final Statement statement, final Query query)
 			throws SQLException {
+		MapperBuilder builder = new MapperBuilder(connectionSettings);
 		String queryString = query.getQueryText();
 		String tableName = getQueryTableName(query);
 
 		datasetBuilder.ensureTable(tableName);
 
 		try (ResultSet resultSet = statement.executeQuery(queryString)) {
-			List<ColumnMapper> mappers = getMappers(resultSet);
+			List<ColumnMapper> mappers = builder.buildMappers(resultSet);
 
 			while (resultSet.next()) {
 				TableRow tableRow = getTableRow(resultSet, tableName, mappers);
@@ -222,30 +214,6 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	}
 
 	/**
-	 * Creates list of {@link ColumnMapper} using result set metadata.
-	 *
-	 * @param resultSet
-	 *            result set
-	 * @return list of mappers
-	 * @throws SQLException
-	 *             if error occurred
-	 */
-	private List<ColumnMapper> getMappers(final ResultSet resultSet) throws SQLException {
-		ResultSetMetaData metadata = resultSet.getMetaData();
-		List<ColumnMapper> result = new ArrayList<>();
-
-		for (int index = 1; index <= metadata.getColumnCount(); index += 1) {
-			String typeName = metadata.getColumnTypeName(index);
-			String columnName = metadata.getColumnName(index);
-			ColumnMapper mapper = getMapperByType(typeName, columnName);
-
-			result.add(mapper);
-		}
-
-		return result;
-	}
-
-	/**
 	 * Unregister all available drivers from {@link DriverManager}. Wraps driver
 	 * to {@link DriverWrapper} and register it in {@link DriverManager}.
 	 *
@@ -272,43 +240,6 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 		}
 
 		DriverManager.registerDriver(wrapper);
-	}
-
-	/**
-	 * Returns column mapper over given column and corresponding to given type.
-	 *
-	 * @param typeName
-	 *            type name
-	 * @param columnName
-	 *            column name
-	 * @return column mapper
-	 */
-	private ColumnMapper getMapperByType(final String typeName, final String columnName) {
-		TypeMapping dataMapper = connectionSettings.getTypeMappers().get(typeName);
-
-		if (dataMapper == null) {
-			return new DummyStringMapper(columnName, new XmlEscape());
-		}
-
-		switch (dataMapper) {
-		case ASCII:
-			return new AsciiStringMapper(columnName, new XmlEscape());
-
-		case UTF8:
-			return new Utf8StringMapper(columnName, new XmlEscape());
-
-		case HEX:
-			return new HexBytesMapper(columnName);
-
-		case BASE64:
-			return new Base64BytesMapper(columnName);
-
-		case BASE64_WITH_PREFIX:
-			return new Base64PrefixBytesMapper(columnName);
-
-		default:
-			throw new IllegalArgumentException("Data mapper " + dataMapper + " has no corresponding class.");
-		}
 	}
 
 	@Override
