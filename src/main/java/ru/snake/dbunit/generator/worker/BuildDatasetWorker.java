@@ -35,6 +35,7 @@ import ru.snake.dbunit.generator.worker.mapper.ColumnMapper;
 import ru.snake.dbunit.generator.worker.mapper.DummyStringMapper;
 import ru.snake.dbunit.generator.worker.mapper.HexBytesMapper;
 import ru.snake.dbunit.generator.worker.mapper.Utf8StringMapper;
+import ru.snake.dbunit.generator.worker.mapper.XmlEscape;
 import ru.snake.dbunit.generator.worker.parse.QueryParser;
 import ru.snake.dbunit.generator.worker.query.Query;
 
@@ -286,15 +287,15 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 		TypeMapping dataMapper = connectionSettings.getTypeMappers().get(typeName);
 
 		if (dataMapper == null) {
-			return new DummyStringMapper(columnName);
+			return new DummyStringMapper(columnName, new XmlEscape());
 		}
 
 		switch (dataMapper) {
 		case ASCII:
-			return new AsciiStringMapper(columnName);
+			return new AsciiStringMapper(columnName, new XmlEscape());
 
 		case UTF8:
-			return new Utf8StringMapper(columnName);
+			return new Utf8StringMapper(columnName, new XmlEscape());
 
 		case HEX:
 			return new HexBytesMapper(columnName);

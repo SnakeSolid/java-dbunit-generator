@@ -7,14 +7,19 @@ public final class Utf8StringMapper implements ColumnMapper {
 
 	private final String columnName;
 
+	private final XmlEscape escape;
+
 	/**
 	 * Creates new text columns to UTF-8 mapper.
 	 *
 	 * @param columnName
 	 *            column name
+	 * @param escape
+	 *            XML escape
 	 */
-	public Utf8StringMapper(final String columnName) {
+	public Utf8StringMapper(final String columnName, final XmlEscape escape) {
 		this.columnName = columnName;
+		this.escape = escape;
 	}
 
 	@Override
@@ -49,18 +54,10 @@ public final class Utf8StringMapper implements ColumnMapper {
 				builder.append(Character.forDigit((ch >> 4) & 0x0f, 16));
 				builder.append(Character.forDigit((ch >> 0) & 0x0f, 16));
 				builder.append(";");
-			} else if (ch == '"') {
-				builder.append("&quot;");
-			} else if (ch == '&') {
-				builder.append("&amp;");
-			} else if (ch == '\'') {
-				builder.append("&apos;");
-			} else if (ch == '<') {
-				builder.append("&lt;");
-			} else if (ch == '>') {
-				builder.append("&gt;");
+			} else if (escape.isEscapeableChar(ch)) {
+				builder.append(escape.escapeChar(ch));
 			} else {
-				builder.append((char) ch);
+				builder.append(ch);
 			}
 		}
 
@@ -69,7 +66,7 @@ public final class Utf8StringMapper implements ColumnMapper {
 
 	@Override
 	public String toString() {
-		return "Utf8StringMapper [columnName=" + columnName + "]";
+		return "Utf8StringMapper [columnName=" + columnName + ", escape=" + escape + "]";
 	}
 
 }

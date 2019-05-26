@@ -7,14 +7,19 @@ public final class AsciiStringMapper implements ColumnMapper {
 
 	private final String columnName;
 
+	private final XmlEscape escape;
+
 	/**
 	 * Creates new text columns to ASCII mapper.
 	 *
 	 * @param columnName
 	 *            column name
+	 * @param escape
+	 *            XML escape
 	 */
-	public AsciiStringMapper(final String columnName) {
+	public AsciiStringMapper(final String columnName, final XmlEscape escape) {
 		this.columnName = columnName;
+		this.escape = escape;
 	}
 
 	@Override
@@ -55,16 +60,8 @@ public final class AsciiStringMapper implements ColumnMapper {
 				builder.append(Character.forDigit((ch >> 4) & 0x0f, 16));
 				builder.append(Character.forDigit((ch >> 0) & 0x0f, 16));
 				builder.append(";");
-			} else if (ch == '"') {
-				builder.append("&quot;");
-			} else if (ch == '&') {
-				builder.append("&amp;");
-			} else if (ch == '\'') {
-				builder.append("&apos;");
-			} else if (ch == '<') {
-				builder.append("&lt;");
-			} else if (ch == '>') {
-				builder.append("&gt;");
+			} else if (escape.isEscapeableChar(ch)) {
+				builder.append(escape.escapeChar(ch));
 			} else {
 				builder.append((char) ch);
 			}
@@ -75,7 +72,7 @@ public final class AsciiStringMapper implements ColumnMapper {
 
 	@Override
 	public String toString() {
-		return "AsciiStringMapper [columnName=" + columnName + "]";
+		return "AsciiStringMapper [columnName=" + columnName + ", escape=" + escape + "]";
 	}
 
 }
