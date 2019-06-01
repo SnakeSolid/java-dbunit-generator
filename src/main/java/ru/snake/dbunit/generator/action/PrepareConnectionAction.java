@@ -84,6 +84,7 @@ public final class PrepareConnectionAction extends AbstractAction implements Act
 			ConnectionSettings settings = new ConnectionSettings(
 				driverConfig.getDriverPath(),
 				driverConfig.getDriverClass(),
+				driverConfig.getTableNameCase(),
 				driverConfig.getTypeMappings(),
 				url
 			);

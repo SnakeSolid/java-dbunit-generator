@@ -167,7 +167,7 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	 */
 	private String getQueryTableName(final Query query) {
 		String tableName = query.getTableName();
-		TableNameCase nameCase = config.getTableNameCase();
+		TableNameCase nameCase = connectionSettings.getTableNameCase();
 
 		if (nameCase == null) {
 			return tableName;

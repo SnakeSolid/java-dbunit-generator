@@ -19,8 +19,6 @@ public final class Configuration {
 
 	private String skipTablePrefix;
 
-	private TableNameCase tableNameCase;
-
 	private Map<String, DriverConfig> drivers;
 
 	/**
@@ -31,7 +29,6 @@ public final class Configuration {
 		this.noTableMode = NoTableMode.ERROR;
 		this.templateTableName = null;
 		this.skipTablePrefix = null;
-		this.tableNameCase = null;
 		this.drivers = new HashMap<>();
 	}
 
@@ -72,15 +69,6 @@ public final class Configuration {
 	}
 
 	/**
-	 * Returns table name case change policy.
-	 *
-	 * @return table name case change mode
-	 */
-	public TableNameCase getTableNameCase() {
-		return tableNameCase;
-	}
-
-	/**
 	 * Returns map with driver configurations.
 	 *
 	 * @return driver map
@@ -92,8 +80,7 @@ public final class Configuration {
 	@Override
 	public String toString() {
 		return "Configuration [font=" + font + ", noTableMode=" + noTableMode + ", templateTableName="
-				+ templateTableName + ", skipTablePrefix=" + skipTablePrefix + ", tableNameCase=" + tableNameCase
-				+ ", drivers=" + drivers + "]";
+				+ templateTableName + ", skipTablePrefix=" + skipTablePrefix + ", drivers=" + drivers + "]";
 	}
 
 }

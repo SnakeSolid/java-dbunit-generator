@@ -18,6 +18,8 @@ public final class DriverConfig {
 
 	private String url;
 
+	private TableNameCase tableNameCase;
+
 	private Map<String, TypeMapping> typeMappings;
 
 	private List<String> parameters;
@@ -29,26 +31,61 @@ public final class DriverConfig {
 		this.driverPath = null;
 		this.driverClass = null;
 		this.url = null;
+		this.tableNameCase = null;
 		this.typeMappings = Collections.emptyMap();
 		this.parameters = Collections.emptyList();
 	}
 
+	/**
+	 * Return path to JDBC driver library.
+	 *
+	 * @return path to driver
+	 */
 	public String getDriverPath() {
 		return driverPath;
 	}
 
+	/**
+	 * Returns JDBC driver class name.
+	 *
+	 * @return driver class name
+	 */
 	public String getDriverClass() {
 		return driverClass;
 	}
 
+	/**
+	 * Returns JDBC connection URL.
+	 *
+	 * @return connection URL
+	 */
 	public String getUrl() {
 		return url;
 	}
 
+	/**
+	 * Returns table name case change policy.
+	 *
+	 * @return table name case change mode
+	 */
+	public TableNameCase getTableNameCase() {
+		return tableNameCase;
+	}
+
+	/**
+	 * Returns JDBC type name to corresponding column mapper map.
+	 *
+	 * @return type name to column mapper map
+	 */
 	public Map<String, TypeMapping> getTypeMappings() {
 		return typeMappings;
 	}
 
+	/**
+	 * Returns list of available connection parameters.
+	 *
+	 * @return list of connection parameter
+	 */
 	public List<String> getParameters() {
 		return parameters;
 	}
@@ -56,7 +93,8 @@ public final class DriverConfig {
 	@Override
 	public String toString() {
 		return "DriverConfig [driverPath=" + driverPath + ", driverClass=" + driverClass + ", url=" + url
-				+ ", typeMappings=" + typeMappings + ", parameters=" + parameters + "]";
+				+ ", tableNameCase=" + tableNameCase + ", typeMappings=" + typeMappings + ", parameters=" + parameters
+				+ "]";
 	}
 
 }
