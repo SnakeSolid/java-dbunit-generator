@@ -39,6 +39,22 @@ where a.name = 'test'
 Both queries will be executed independently. Last query will be used as is.
 Result will contain three tables: `table_a`,  `table_b` and  `table_c`.
 
+## Query Comment
+
+Every query can contain single-line comments. First comment will be used to
+set query type:
+
+ - by default query with missing comment will be used as template. This
+behavior can be changed using configuration option `noTableMode`;
+ - if query comment starts with `-` sign -- this query will be ignored.
+This comment can be used to temporarily exclude some queries from result.
+Prefix can be changed using configuration option `skipTablePrefix`;
+ - if query comment is `*` sign -- this query will used as template.
+This value can be changed using configuration option `templateTableName`;
+
+All other comments will be used in result set as table names. All other
+comments except for first will not be used and can contain any text.
+
 ## Configuration
 
 Configuration file example:
@@ -64,7 +80,7 @@ skipTablePrefix: "-"
 # Map connection name to driver setting. Several connections can
 # use similar settings with different parameters.
 drivers:
-  "PostgreSQL": # Connection name. This name will be shown in driver settings dalog.
+  "PostgreSQL": # Connection name. This name will be shown in driver settings dialog.
     # URL-like path to JDBC driver library.
     driverPath: "file:lib/postgresql-42.2.5.jar"
 
