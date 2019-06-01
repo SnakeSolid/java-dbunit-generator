@@ -61,10 +61,6 @@ templateTableName: "*"
 # If defined this name prefix can be used to ignore queries.
 skipTablePrefix: "-"
 
-# Table name case change policy: UPPER or LOWER.
-# If defined table name will be changed to corresponding case.
-tableNameCase: UPPER
-
 # Map connection name to driver setting. Several connections can
 # use similar settings with different parameters.
 drivers:
@@ -79,6 +75,10 @@ drivers:
     # special place holders for parameters. Placeholder must be in
     # format "{parameter_name}", where parameter_name - parameter name.
     url: "jdbc:postgresql://{host}:{port}/{database}?user={user}&password={password}"
+
+    # Table name case change policy: UPPER or LOWER.
+    # If defined table name will be changed to corresponding case.
+    tableNameCase: UPPER
 
     # Type mapping. By default all types will be shown as raw strings.
     # If some type requires some conversion, it can be defined in mappings.
