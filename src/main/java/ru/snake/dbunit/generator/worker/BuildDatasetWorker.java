@@ -8,7 +8,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -231,14 +230,9 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 		Driver driver = (Driver) driverClass.newInstance();
 		DriverWrapper wrapper = new DriverWrapper(driver);
 
-		Enumeration<Driver> drivers = DriverManager.getDrivers();
-
-		while (drivers.hasMoreElements()) {
-			Driver oldDriver = drivers.nextElement();
-
-			DriverManager.deregisterDriver(oldDriver);
-		}
-
+		// Deregister created driver if it was registered in static initializer.
+		DriverDeregistrator.deregisterAll();
+		// Register wrapped driver to allow access to it from this class loader.
 		DriverManager.registerDriver(wrapper);
 	}
 
