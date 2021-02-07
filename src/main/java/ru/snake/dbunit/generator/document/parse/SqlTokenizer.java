@@ -44,6 +44,7 @@ public class SqlTokenizer {
 		KEYWORDS.add("limit");
 		KEYWORDS.add("for");
 		KEYWORDS.add("in");
+		KEYWORDS.add("between");
 		KEYWORDS.add("not");
 		KEYWORDS.add("and");
 		KEYWORDS.add("or");
