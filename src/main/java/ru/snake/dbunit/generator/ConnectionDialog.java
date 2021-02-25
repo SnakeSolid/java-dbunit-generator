@@ -1,15 +1,19 @@
 package ru.snake.dbunit.generator;
 
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableColumnModel;
@@ -102,6 +106,9 @@ public final class ConnectionDialog extends JDialog {
 		CloseDialogAction closeAction = new CloseDialogAction(this);
 		JButton saveButton = new JButton(connectionAction);
 		JButton cancelButton = new JButton(closeAction);
+		KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+		JRootPane rootPane = this.getRootPane();
+		rootPane.registerKeyboardAction(closeAction, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 
 		// @formatter:off
 		layout.setHorizontalGroup(
