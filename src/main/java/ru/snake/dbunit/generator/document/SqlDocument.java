@@ -3,6 +3,7 @@ package ru.snake.dbunit.generator.document;
 import java.awt.Color;
 import java.util.List;
 
+import javax.swing.event.UndoableEditEvent;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
@@ -10,6 +11,7 @@ import javax.swing.text.Document;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
+import javax.swing.undo.UndoableEdit;
 
 import ru.snake.dbunit.generator.document.parse.SqlTokenizer;
 import ru.snake.dbunit.generator.document.parse.Token;
@@ -38,8 +40,10 @@ public final class SqlDocument extends DefaultStyledDocument implements Document
 		StyleConstants.setBold(KEYWORD_STYLE, true);
 	}
 
+	/**
+	 * Creates new SQL document.
+	 */
 	public SqlDocument() {
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -54,6 +58,21 @@ public final class SqlDocument extends DefaultStyledDocument implements Document
 		super.remove(offs, len);
 
 		processChanges(offs, 0);
+	}
+
+	@Override
+	protected void fireUndoableEditUpdate(final UndoableEditEvent e) {
+		UndoableEdit edit = e.getEdit();
+
+		if (edit instanceof DefaultDocumentEvent) {
+			DefaultDocumentEvent documentEvent = (DefaultDocumentEvent) edit;
+			UndoableEdit undoableEdit = new DocumentEvertWrapper(documentEvent);
+			UndoableEditEvent newEvent = new UndoableEditEvent(e.getSource(), undoableEdit);
+
+			super.fireUndoableEditUpdate(newEvent);
+		} else {
+			super.fireUndoableEditUpdate(e);
+		}
 	}
 
 	/**

@@ -6,8 +6,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.text.Document;
+import javax.swing.undo.UndoManager;
 
-import ru.snake.dbunit.generator.TextUndoManager;
 import ru.snake.dbunit.generator.listener.DocumentModifiedListener;
 
 public final class RedoAction extends AbstractAction implements Action {
@@ -16,7 +16,7 @@ public final class RedoAction extends AbstractAction implements Action {
 
 	private final Document document;
 
-	private final TextUndoManager undoManager;
+	private final UndoManager undoManager;
 
 	/**
 	 * Creates new undo action for given undo manager.
@@ -28,7 +28,7 @@ public final class RedoAction extends AbstractAction implements Action {
 	 * @param undoManager
 	 *            undo manager
 	 */
-	public RedoAction(final JFrame frame, final Document document, final TextUndoManager undoManager) {
+	public RedoAction(final JFrame frame, final Document document, final UndoManager undoManager) {
 		this.frame = frame;
 		this.document = document;
 		this.undoManager = undoManager;

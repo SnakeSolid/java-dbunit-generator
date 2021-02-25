@@ -320,11 +320,10 @@ public final class MainFrame extends JFrame {
 	 */
 	private void initUndoManager(final JTextComponent textComponent) {
 		UndoManager undoManager = new UndoManager();
-		TextUndoManager textManager = new TextUndoManager(undoManager);
 		Document document = textComponent.getDocument();
-		Action undoAction = new UndoAction(this, document, textManager);
-		Action redoAction = new RedoAction(this, document, textManager);
-		document.addUndoableEditListener(textManager);
+		Action undoAction = new UndoAction(this, document, undoManager);
+		Action redoAction = new RedoAction(this, document, undoManager);
+		document.addUndoableEditListener(undoManager);
 
 		InputMap inputMap = textComponent.getInputMap();
 		inputMap.put(KeyStroke.getKeyStroke("control Z"), "Undo");
