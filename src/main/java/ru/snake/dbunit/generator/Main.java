@@ -13,7 +13,6 @@ import ru.snake.dbunit.generator.config.ReadConfigException;
 import ru.snake.dbunit.generator.model.MainModel;
 import ru.snake.dbunit.generator.options.CliOptions;
 import ru.snake.dbunit.generator.options.CliOptionsParseException;
-import ru.snake.dbunit.generator.options.NoParameterException;
 import ru.snake.dbunit.generator.options.OptionsParser;
 
 /**
@@ -61,10 +60,6 @@ public final class Main {
 			}
 		} catch (CliOptionsParseException e) {
 			parser.printHelp();
-
-			System.exit(EXIT_CONFIGURATIN_ERROR);
-		} catch (NoParameterException e) {
-			System.err.println(e.getMessage());
 
 			System.exit(EXIT_CONFIGURATIN_ERROR);
 		}

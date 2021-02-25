@@ -47,7 +47,7 @@ public final class OptionsParser {
 
 	private final Map<String, String> environment;
 
-	private Options options;
+	private final Options options;
 
 	/**
 	 * Create new parser from options from arguments and environment.
@@ -79,12 +79,10 @@ public final class OptionsParser {
 	 * option not defined.
 	 *
 	 * @return application options
-	 * @throws NoParameterException
-	 *             if required parameters missed
 	 * @throws CliOptionsParseException
 	 *             if command line option are invalid
 	 */
-	public CliOptions getOptions() throws NoParameterException, CliOptionsParseException {
+	public CliOptions getOptions() throws CliOptionsParseException {
 		CommandLine commandLine;
 
 		try {
