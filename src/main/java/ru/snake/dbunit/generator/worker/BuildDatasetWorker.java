@@ -4,11 +4,11 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.Driver;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
@@ -98,21 +98,23 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 
 		String driverClassName = connectionSettings.getDriverClass();
 		String connectionUrl = connectionSettings.getUrl();
+		Properties properties = new Properties();
 		URL url = new URL(connectionSettings.getDriverPath());
 		URL[] urls = new URL[] { url };
 
 		try (URLClassLoader classLoader = new URLClassLoader(urls, ClassLoader.getSystemClassLoader())) {
 			Class<?> driverClass = classLoader.loadClass(driverClassName);
+			Driver driver;
 
 			if (Driver.class.isAssignableFrom(driverClass)) {
-				registerWrappedDriver(driverClass);
+				driver = createDriver(driverClass);
 			} else {
 				return Result.error("Driver class " + driverClassName + " does not implement java.sql.Driver.");
 			}
 
 			DatasetBuilder datasetBuilder = new DatasetBuilder();
 
-			try (Connection connection = DriverManager.getConnection(connectionUrl);
+			try (Connection connection = driver.connect(connectionUrl, properties);
 					Statement statement = connection.createStatement()) {
 				for (Query query : queries) {
 					fillQueryDataset(datasetBuilder, statement, query);
@@ -120,6 +122,8 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 			}
 
 			return Result.ok(datasetBuilder.build());
+		} finally {
+			DriverDeregistrator.deregisterAll();
 		}
 	}
 
@@ -213,27 +217,22 @@ public final class BuildDatasetWorker extends SwingWorker<Result<String, String>
 	}
 
 	/**
-	 * Unregister all available drivers from {@link DriverManager}. Wraps driver
-	 * to {@link DriverWrapper} and register it in {@link DriverManager}.
+	 * Create new driver instance.
 	 *
 	 * @param driverClass
 	 *            driver class
+	 * @return driver instance
 	 * @throws InstantiationException
 	 *             if instance not created
 	 * @throws IllegalAccessException
 	 *             if constructor private
-	 * @throws SQLException
+	 * @throws ReflectiveOperationException
 	 *             if error occurred
 	 */
-	private void registerWrappedDriver(final Class<?> driverClass)
-			throws InstantiationException, IllegalAccessException, SQLException {
-		Driver driver = (Driver) driverClass.newInstance();
-		DriverWrapper wrapper = new DriverWrapper(driver);
+	private Driver createDriver(final Class<?> driverClass) throws ReflectiveOperationException {
+		Driver driver = (Driver) driverClass.getConstructor().newInstance();
 
-		// Deregister created driver if it was registered in static initializer.
-		DriverDeregistrator.deregisterAll();
-		// Register wrapped driver to allow access to it from this class loader.
-		DriverManager.registerDriver(wrapper);
+		return driver;
 	}
 
 	@Override
