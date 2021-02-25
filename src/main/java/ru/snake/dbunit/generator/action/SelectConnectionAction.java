@@ -26,8 +26,6 @@ public final class SelectConnectionAction extends AbstractAction implements Acti
 
 	private final Configuration config;
 
-	private final ConnectionDialog dialog;
-
 	/**
 	 * Create new select connection action.
 	 *
@@ -39,7 +37,6 @@ public final class SelectConnectionAction extends AbstractAction implements Acti
 	public SelectConnectionAction(final MainFrame mainFrame, final Configuration config) {
 		this.mainFrame = mainFrame;
 		this.config = config;
-		this.dialog = new ConnectionDialog(this.mainFrame, this.config);
 
 		Icon smallIcon = new ImageIcon(ClassLoader.getSystemResource("icons/plug-x16.png"));
 		Icon largeIcon = new ImageIcon(ClassLoader.getSystemResource("icons/plug-x24.png"));
@@ -54,6 +51,7 @@ public final class SelectConnectionAction extends AbstractAction implements Acti
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
+		ConnectionDialog dialog = this.mainFrame.getConnectionDialog();
 		dialog.setVisible(true);
 
 		if (dialog.hasSelectedConnection()) {

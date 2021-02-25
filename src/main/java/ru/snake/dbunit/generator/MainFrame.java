@@ -65,6 +65,8 @@ public final class MainFrame extends JFrame {
 
 	private final MainModel model;
 
+	private ConnectionDialog connectionDialog;
+
 	private Action newFileAction;
 
 	private Action openFileAction;
@@ -355,6 +357,20 @@ public final class MainFrame extends JFrame {
 	 */
 	public MainModel getModel() {
 		return model;
+	}
+
+	/**
+	 * Returns lay initialized {@link ConnectionDialog} to select connection
+	 * settings.
+	 *
+	 * @return connection dialog
+	 */
+	public ConnectionDialog getConnectionDialog() {
+		if (this.connectionDialog == null) {
+			this.connectionDialog = new ConnectionDialog(this, this.config);
+		}
+
+		return this.connectionDialog;
 	}
 
 }

@@ -63,6 +63,7 @@ public final class ConnectionDialog extends JDialog {
 
 		createComponents();
 		pack();
+		setLocationRelativeTo(parent);
 	}
 
 	/**
